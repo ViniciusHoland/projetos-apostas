@@ -103,6 +103,31 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+
+
+router.get('/caixa', async (req, res) => {
+  try {
+    const apostas = await Aposta.find();
+    let totalEntradas = apostas.reduce((acc, aposta) => acc + aposta.valorApostado, 0);
+    // Aqui você pode buscar saídas de outro modelo se quiser (ou armazenar na sessão)
+    res.render('dashboard-caixa', { totalEntradas, saidasManuais: 0, apostas });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao carregar o caixa');
+  }
+});
+
+router.get('/apostas', async (req, res) => {
+  try {
+    const apostas = await Aposta.find();
+    res.json(apostas);
+  } catch (err) {
+    res.status(500).send('Erro ao buscar apostas');
+  }
+});
+
+
 // Rota API para buscar aposta por ID
 router.get('/:id', async (req, res) => {
   try {
@@ -113,6 +138,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 });
+
 
 // Rota para deletar aposta
 router.post('/delete/:id', async (req, res) => {

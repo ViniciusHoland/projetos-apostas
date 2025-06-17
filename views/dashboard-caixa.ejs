@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Caixa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  <style>
+    .caixa {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #f1f8e9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+    
+  <div class="container">
+
+    
+    <div class="caixa">
+         <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
+      <a href="/apostas" class="btn btn-success btn-lg px-4">
+        <i class="fas fa-futbol"></i> Apostas
+      </a>
+
+      <br>
+      <br>
+      <h3>📊 Dashboard do Caixa</h3>
+      <p><strong>Total Entradas (Apostas):</strong> R$ <span id="entradas"><%= totalEntradas.toFixed(2) %></span></p>
+      <p><strong>Total Saídas:</strong> R$ <span id="saidas"><%= saidasManuais.toFixed(2) %></span></p>
+      <p><strong>Saldo:</strong> R$ <span id="saldo"><%= (totalEntradas - saidasManuais).toFixed(2) %></span></p>
+
+      <button class="btn btn-primary btn-sm" onclick="atualizarCaixa()">🔄 Atualizar Caixa</button>
+
+      <hr>
+
+      <h5>Adicionar Saída Manual</h5>
+      <div class="input-group mb-3">
+        <input type="number" class="form-control" id="valorSaida" placeholder="Valor da saída">
+        <button class="btn btn-danger" onclick="adicionarSaida()">Registrar Saída</button>
+      </div>
+
+      <div id="logSaidas"></div>
+    </div>
+  </div>
+
+  <script>
+    let saidas = 0;
+
+    function atualizarCaixa() {
+      fetch('/apostas') // ajuste se necessário sua rota
+        .then(res => res.json())
+        .then(data => {
+          const total = data.reduce((acc, aposta) => acc + aposta.valorApostado, 0);
+          document.getElementById('entradas').textContent = total.toFixed(2);
+          document.getElementById('saldo').textContent = (total - saidas).toFixed(2);
+        })
+        .catch(() => alert('Erro ao atualizar o caixa'));
+    }
+
+    function adicionarSaida() {
+      const valor = parseFloat(document.getElementById('valorSaida').value);
+      if (isNaN(valor) || valor <= 0) {
+        alert('Informe um valor válido');
+        return;
+      }
+      saidas += valor;
+      document.getElementById('saidas').textContent = saidas.toFixed(2);
+      const entradas = parseFloat(document.getElementById('entradas').textContent);
+      document.getElementById('saldo').textContent = (entradas - saidas).toFixed(2);
+      document.getElementById('logSaidas').innerHTML += `<div class="text-danger">Saída registrada: R$ ${valor.toFixed(2)}</div>`;
+      document.getElementById('valorSaida').value = '';
+    }
+  </script>
+</body>
+</html>

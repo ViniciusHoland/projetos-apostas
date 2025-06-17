@@ -102,10 +102,7 @@ router.post('/editar/:id', async (req, res) => {
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,
-      oddsPersonalizadas: req.body.oddsPersonalizadas.map(odd => ({
-        descricao: odd.descricao,
-        valor: Number(odd.valor)
-      }))
+      oddsPersonalizadas: req.body.oddsPersonalizadas
     });
     res.redirect('/jogos');
   } catch (err) {
