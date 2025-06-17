@@ -43,7 +43,7 @@ router.post('/apostar', async (req, res) => {
       tipoOdd: jogo.tipoOdd || '---',
       valorOdd: jogo.valorOdd || 0,
       status: jogo.status && jogo.status !== '' ? jogo.status : 'Aguardando',
-      dataHora: parseDate(jogo.dataHora) || null,
+      dataHora: jogo.dataHora || 'Data não disponível' // Mantém como string
     }));
 
     const aposta = new Aposta({

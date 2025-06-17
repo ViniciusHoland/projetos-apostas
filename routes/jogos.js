@@ -8,11 +8,21 @@ router.post('/cadastro', async (req, res) => {
 
     console.log("dados recebidos ", req.body);
 
+
+    const rawDate = new Date(req.body.dataHora);
+    const dia = String(rawDate.getDate()).padStart(2, '0');
+    const mes = String(rawDate.getMonth() + 1).padStart(2, '0'); // Janeiro = 0
+    const ano = rawDate.getFullYear();
+    const hora = String(rawDate.getHours()).padStart(2, '0');
+    const minuto = String(rawDate.getMinutes()).padStart(2, '0');
+
+    const dataFormatada = `${dia}/${mes}/${ano} - ${hora}:${minuto}`;
+
     const novoJogo = new Jogo({
       campeonato: req.body.campeonato,
       timeCasa: req.body.timeCasa,
       timeFora: req.body.timeFora,
-      dataHora: new Date(req.body.dataHora),
+      dataHora: dataFormatada,
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,
@@ -91,14 +101,26 @@ router.post('/editar/:id', async (req, res) => {
 
   try {
 
-    console.log("dados recebidos ", req.body);
+    //console.log("dados recebidos ", req.body);
+
+    console.log("tipo da data", req.body.dataHora);
+
+
+    const rawDate = new Date(req.body.dataHora);
+    const dia = String(rawDate.getDate()).padStart(2, '0');
+    const mes = String(rawDate.getMonth() + 1).padStart(2, '0'); // Janeiro = 0
+    const ano = rawDate.getFullYear();
+    const hora = String(rawDate.getHours()).padStart(2, '0');
+    const minuto = String(rawDate.getMinutes()).padStart(2, '0');
+
+    const dataFormatada = `${dia}/${mes}/${ano} - ${hora}:${minuto}`;
 
 
     await Jogo.findByIdAndUpdate(req.params.id, {
       campeonato: req.body.campeonato,
       timeCasa: req.body.timeCasa,
       timeFora: req.body.timeFora,
-      dataHora: new Date(req.body.dataHora),
+      dataHora: dataFormatada,
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,

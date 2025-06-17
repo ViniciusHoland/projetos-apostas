@@ -56,17 +56,15 @@
                 <% campeonatos[campeonato].forEach(jogo => { const nomeJogo =
                 jogo.timeCasa + " x " + jogo.timeFora; const campeonatoLimpo =
                 campeonato.replace(/"/g, '&quot;').replace(/'/g, '&#39;'); const
-                dataHoraFormatada = new
-                Date(jogo.dataHora).toLocaleString('pt-BR', { day: '2-digit',
-                month: '2-digit', year: 'numeric', hour: '2-digit', minute:
-                '2-digit' }); %>
+                dataHoraFormatada = jogo.dataHora; const dataHoraISO =
+                jogo.dataHora; // você pode renomear se quiser %>
                 <tr>
                   <td><%= dataHoraFormatada %></td>
                   <td><%= nomeJogo %></td>
                   <td>
                     <button
                       class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Casa", <%= jogo.oddCasa %>, "<%= campeonatoLimpo %>", "<%= dataHoraFormatada %>")'
+                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Casa", <%= jogo.oddCasa %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
                     >
                       <%= jogo.oddCasa.toFixed(2) %>
                     </button>
@@ -74,7 +72,7 @@
                   <td>
                     <button
                       class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Empate", <%= jogo.oddEmpate %>, "<%= campeonatoLimpo %>", "<%= dataHoraFormatada %>")'
+                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Empate", <%= jogo.oddEmpate %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
                     >
                       <%= jogo.oddEmpate.toFixed(2) %>
                     </button>
@@ -82,7 +80,7 @@
                   <td>
                     <button
                       class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Fora", <%= jogo.oddFora %>, "<%= campeonatoLimpo %>", "<%= dataHoraFormatada %>")'
+                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Fora", <%= jogo.oddFora %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
                     >
                       <%= jogo.oddFora.toFixed(2) %>
                     </button>
@@ -97,7 +95,7 @@
                       <li>
                         <button
                           class="btn btn-outline-primary btn-sm odd-btn"
-                          onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraFormatada %>")'
+                          onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
                         >
                           <strong><%= o.descricao %></strong>: <%=
                           Number(o.valor).toFixed(2) %>
@@ -143,7 +141,8 @@
             min="0"
             step="0.01"
             class="form-control mb-2"
-            value="0"
+            value=""
+
             oninput="atualizarRetorno()"
           />
 
@@ -280,10 +279,10 @@
           (acc, item) => acc * item.valorOdd,
           1
         );
-        let  possivelRetorno = cotacaoTotal * valorTotal;
+        let possivelRetorno = cotacaoTotal * valorTotal;
 
         if (possivelRetorno > 1500) {
-          possivelRetorno = 1500
+          possivelRetorno = 1500;
         }
 
         const aposta = {

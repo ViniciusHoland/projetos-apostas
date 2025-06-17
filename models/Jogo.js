@@ -4,7 +4,7 @@ const jogoSchema = new mongoose.Schema({
   campeonato: String,
   timeCasa: String,
   timeFora: String,
-  dataHora: Date,
+  dataHora: String,
   oddCasa: Number,
   oddEmpate: Number,
   oddFora: Number,

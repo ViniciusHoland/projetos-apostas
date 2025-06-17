@@ -6,7 +6,7 @@ const jogoApostadoSchema = new mongoose.Schema({
   jogoNome: String,
   tipoOdd: String,
   valorOdd: Number,
-  dataHora: Date,
+  dataHora: String,
   status: {
     type: String,
     default: 'Aguardando'

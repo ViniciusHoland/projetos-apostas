@@ -15,38 +15,36 @@
 
 <body class="bg-light">
   <div class="container mt-5">
-
     
-      <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
-   
+    <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
+    <a href="/jogos" class="btn btn-info btn-lg">📋 Listar jogos</a>
 
-      <a href="/jogos" class="btn btn-info btn-lg">📋 Listar jogos</a>
     <h2 class="mb-4">Apostas Registradas</h2>
 
     <% if (apostas.length === 0) { %>
-    <div class="alert alert-info">Nenhuma aposta encontrada.</div>
+      <div class="alert alert-info">Nenhuma aposta encontrada.</div>
     <% } else { %>
-    <div class="list-group">
-      <% apostas.forEach(aposta => { %>
-      <div class="list-group-item mb-3 shadow-sm">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <strong><%= aposta.nomeCliente %></strong> <br>
-            <small><%= new Date(aposta.data).toLocaleString() %></small><br>
-            <small><%= aposta.jogos.length %> jogos | Total: R$ <%= aposta.valorApostado.toFixed(2) %></small>
+      <div class="list-group">
+        <% apostas.forEach(aposta => { %>
+          <div class="list-group-item mb-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong><%= aposta.nomeCliente %></strong> <br>
+                <small><%= aposta.data %></small><br>
+                <small><%= aposta.jogos.length %> jogos | Total: R$ <%= aposta.valorApostado.toFixed(2) %></small>
+              </div>
+              <div>
+                <form action="/apostas/delete/<%= aposta._id %>" method="POST"
+                  onsubmit="return confirm('Tem certeza que deseja excluir esta aposta?')">
+                  <button class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+              </div>
+            </div>
+            <button class="btn btn-link p-0 mt-2" onclick="toggleDetalhes('<%= aposta._id %>')">Ver Bilhete</button>
+            <div id="detalhes-<%= aposta._id %>" class="detalhes"></div>
           </div>
-          <div>
-            <form action="/apostas/delete/<%= aposta._id %>" method="POST"
-              onsubmit="return confirm('Tem certeza que deseja excluir esta aposta?')">
-              <button class="btn btn-danger btn-sm">Excluir</button>
-            </form>
-          </div>
-        </div>
-        <button class="btn btn-link p-0 mt-2" onclick="toggleDetalhes('<%= aposta._id %>')">Ver Bilhete</button>
-        <div id="detalhes-<%= aposta._id %>" class="detalhes"></div>
+        <% }) %>
       </div>
-      <% }) %>
-    </div>
     <% } %>
   </div>
 
@@ -73,8 +71,7 @@
     }
 
     function gerarBilheteVisual(aposta) {
-
-       const linkBilhete = `${window.location.origin}/apostas/bilhete/${aposta._id}`;
+      const linkBilhete = `${window.location.origin}/apostas/bilhete/${aposta._id}`;
 
       return `
       <div class="border p-3 bg-light mt-3 shadow-sm" style="max-width: 380px; margin: auto;">
@@ -84,7 +81,7 @@
         <a href="${linkBilhete}" target="_blank">${linkBilhete}</a>
       </div>
 
-        <p><strong>DATA:</strong> ${new Date(aposta.data).toLocaleString()}</p>
+        <p><strong>DATA:</strong> ${aposta.data}</p>
         <p><strong>CLIENTE:</strong> ${aposta.nomeCliente || "---"}</p>
         <hr/>
         <div class="d-flex justify-content-between">
@@ -94,7 +91,7 @@
         <hr/>
         ${aposta.jogos.map(jogo => `
         <div>
-          <strong>Futebol - ${new Date(jogo.dataHora).toLocaleString()}</strong><br/>
+          <strong>Futebol - ${jogo.dataHora}</strong><br/>
           ${jogo.campeonato || "Campeonato"}<br/>
           ${jogo.jogoNome || "---"}<br/>
           Resultado: <strong>${jogo.tipoOdd || "---"}</strong><br/>
