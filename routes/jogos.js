@@ -6,7 +6,7 @@ const Jogo = require('../models/Jogo');
 router.post('/cadastro', async (req, res) => {
   try {
 
-    console.log("dados recebidos ", req.body);
+    //console.log("dados recebidos ", req.body);
 
 
     const rawDate = new Date(req.body.dataHora);
@@ -56,33 +56,6 @@ router.get('/', async (req, res) => {
 });
 
 
-// GET - Listar jogos do dia agrupados por campeonato
-/*router.get('/', async (req, res) => {
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  const amanha = new Date();
-  amanha.setHours(23, 59, 59, 999);
-
-  try {
-    const jogos = await Jogo.find({
-      dataHora: { $gte: hoje, $lte: amanha }
-    }).sort({ campeonato: 1, dataHora: 1 });
-
-    const campeonatos = {};
-    jogos.forEach(jogo => {
-      const camp = jogo.campeonato || 'Outros';
-      if (!campeonatos[camp]) campeonatos[camp] = [];
-      campeonatos[camp].push(jogo);
-    });
-
-    res.render('home', { campeonatos });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Erro ao buscar jogos do dia');
-  }
-});*/
-
 // GET - Página de edição
 router.get('/editar/:id', async (req, res) => {
   try {
@@ -103,7 +76,7 @@ router.post('/editar/:id', async (req, res) => {
 
     //console.log("dados recebidos ", req.body);
 
-    console.log("tipo da data", req.body.dataHora);
+    //console.log("tipo da data", req.body.dataHora);
 
 
     const rawDate = new Date(req.body.dataHora);

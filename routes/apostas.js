@@ -10,7 +10,7 @@ router.post('/apostar', async (req, res) => {
 
     const retornoEstimado = possivelRetorno;
 
-    console.log('Dados recebidos:', req.body);
+    //console.log('Dados recebidos:', req.body);
 
     if (!nomeCliente || nomeCliente.trim() === '') {
       return res.status(400).send('Nome do cliente é obrigatório');
@@ -69,7 +69,7 @@ router.get('/bilhete/:id', async (req, res) => {
 
     const bilhete = await Aposta.findById(req.params.id);
 
-    console.log("Jogos do bilhete:", bilhete.jogos)
+    //console.log("Jogos do bilhete:", bilhete.jogos)
 
     if (!bilhete) {
       return res.status(404).send('Bilhete não encontrado');
