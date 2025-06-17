@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Aposta = require('../models/Aposta');
 
+
+
 router.post('/apostar', async (req, res) => {
   try {
     const { nomeCliente, jogos, valorApostado, possivelRetorno } = req.body;
 
-    const retornoEstimado = possivelRetorno
+    const retornoEstimado = possivelRetorno;
 
     console.log('Dados recebidos:', req.body);
 
@@ -18,9 +20,35 @@ router.post('/apostar', async (req, res) => {
       return res.status(400).send('Dados inválidos');
     }
 
+    const parseDate = (str) => {
+      // Esperado: "17/06/2025, 19:30"
+      if (!str || typeof str !== 'string') return null;
+
+      const [data, hora] = str.split(', ');
+      const [dia, mes, ano] = data.split('/');
+
+      // Monta string em formato ISO: YYYY-MM-DDTHH:MM:SS
+      const dateISO = `${ano}-${mes}-${dia}T${hora}:00`;
+
+      const dateObj = new Date(dateISO);
+      return isNaN(dateObj.getTime()) ? null : dateObj;
+    };
+
+
+    // ✅ Trata os jogos e garante o campo dataHora e status
+    const jogosCompletos = jogos.map(jogo => ({
+      campeonato: jogo.campeonato || '---',
+      jogoId: jogo.jogoId,
+      jogoNome: jogo.jogoNome || '---',
+      tipoOdd: jogo.tipoOdd || '---',
+      valorOdd: jogo.valorOdd || 0,
+      status: jogo.status && jogo.status !== '' ? jogo.status : 'Aguardando',
+      dataHora: parseDate(jogo.dataHora) || null,
+    }));
+
     const aposta = new Aposta({
       nomeCliente,
-      jogos,
+      jogos: jogosCompletos,
       valorApostado,
       retornoEstimado,
       data: new Date()
@@ -38,7 +66,11 @@ router.post('/apostar', async (req, res) => {
 
 router.get('/bilhete/:id', async (req, res) => {
   try {
+
     const bilhete = await Aposta.findById(req.params.id);
+
+    console.log("Jogos do bilhete:", bilhete.jogos)
+
     if (!bilhete) {
       return res.status(404).send('Bilhete não encontrado');
     }
@@ -54,8 +86,8 @@ router.post('/:apostaId/jogo/:jogoId/status', async (req, res) => {
 
   try {
 
-  const { apostaId, jogoId } = req.params;
-  const { status } = req.body;
+    const { apostaId, jogoId } = req.params;
+    const { status } = req.body;
 
 
     await Aposta.updateOne(
@@ -93,15 +125,7 @@ router.post('/bilhete/:id/status', async (req, res) => {
 
 
 
-// Rota para listar todas as apostas
-router.get('/', async (req, res) => {
-  try {
-    const apostas = await Aposta.find().sort({ data: -1 });
-    res.render('listarApostas', { apostas });
-  } catch (err) {
-    res.status(500).send('Erro ao buscar apostas');
-  }
-});
+
 
 
 
@@ -136,6 +160,17 @@ router.get('/:id', async (req, res) => {
     res.json(aposta);
   } catch (err) {
     res.status(500).send('Erro no servidor');
+  }
+});
+
+
+// Rota para listar todas as apostas
+router.get('/', async (req, res) => {
+  try {
+    const apostas = await Aposta.find().sort({ data: -1 });
+    res.render('listarApostas', { apostas });
+  } catch (err) {
+    res.status(500).send('Erro ao buscar apostas');
   }
 });
 

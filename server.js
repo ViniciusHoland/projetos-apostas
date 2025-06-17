@@ -22,8 +22,10 @@ mongoose.connect(process.env.MONGODB_URI)
 // Rotas
 const jogosRoutes = require('./routes/jogos');
 const apostasRoutes =  require('./routes/apostas');
+const saida = require('./routes/saida');
 app.use('/jogos', jogosRoutes);
 app.use('/apostas', apostasRoutes);
+app.use('/', saida);
 
 // Página inicial
 app.get('/', (req, res) => {
