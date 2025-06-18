@@ -23,9 +23,32 @@ mongoose.connect(process.env.MONGODB_URI)
 const jogosRoutes = require('./routes/jogos');
 const apostasRoutes =  require('./routes/apostas');
 const saida = require('./routes/saida');
+const apiJogos = require('./routes/apijogos');
+app.use('/api', apiJogos);
 app.use('/jogos', jogosRoutes);
 app.use('/apostas', apostasRoutes);
 app.use('/', saida);
+
+
+// ====== CONTROLE DE INATIVIDADE ======
+let ultimaRequisicao = Date.now();
+
+// Middleware que registra o horário da última requisição
+app.use((req, res, next) => {
+  ultimaRequisicao = Date.now();
+  next();
+});
+
+// Verifica a cada 10 minutos se já passou 2h sem acesso
+setInterval(() => {
+  const agora = Date.now();
+  const duasHoras = 2 * 60 * 60 * 1000;
+
+  if (agora - ultimaRequisicao > duasHoras) {
+    console.log('Mais de 2 horas sem atividade. Encerrando servidor...');
+    process.exit(); // Render entrará em modo sleeping
+  }
+}, 10 * 60 * 1000); // Verifica a cada 10 minutos
 
 // Página inicial
 app.get('/', (req, res) => {
