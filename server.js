@@ -5,6 +5,14 @@ require('dotenv').config();
 
 const app = express();
 
+// ====== CONTROLE DE INATIVIDADE ======
+let ultimaRequisicao = Date.now();
+
+// Middleware que registra o horário da última requisição
+app.use((req, res, next) => {
+  ultimaRequisicao = Date.now();
+  next();
+});
 
 
 // Middlewares
@@ -30,14 +38,6 @@ app.use('/apostas', apostasRoutes);
 app.use('/', saida);
 
 
-// ====== CONTROLE DE INATIVIDADE ======
-let ultimaRequisicao = Date.now();
-
-// Middleware que registra o horário da última requisição
-app.use((req, res, next) => {
-  ultimaRequisicao = Date.now();
-  next();
-});
 
 // Verifica a cada 10 minutos se já passou 2h sem acesso
 setInterval(() => {
