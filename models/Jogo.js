@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const jogoSchema = new mongoose.Schema({
+  fixtureId: { type: Number, unique: true, sparse: true },
   campeonato: String,
   timeCasa: String,
   timeFora: String,

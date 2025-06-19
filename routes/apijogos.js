@@ -12,7 +12,7 @@ router.get('/leagues', async (req, res) => {
         'x-apisports-key': API_TOKEN
       },
       params: {
-        id: 15,
+        season: '2025'
       }
     });
     const leagues = response.data.response;
@@ -28,38 +28,48 @@ router.get('/leagues', async (req, res) => {
   }
 })
 
+const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
 const leagueFiltro = new Set([15, 72, 71, 363, 265, 239, 907]);
-const CASA_DE_APOSTA = 'Bet365'; // nome exato da casa de aposta
+const CASA_DE_APOSTA = 'Pinnacle'; // nome exato da casa de aposta
+
 
 router.get('/jogos-hoje', async (req, res) => {
   try {
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = new Date();
+    const amanha = new Date();
+    amanha.setDate(hoje.getDate() + 1);
 
-    const response = await axios.get('https://v3.football.api-sports.io/fixtures', {
-      headers: {
-        'x-apisports-key': API_TOKEN
-      },
-      params: {
-        date: hoje,
-        timezone: 'America/Sao_Paulo'
-      }
-    });
+    const dataHoje = hoje.toISOString().split('T')[0];
+    const dataAmanha = amanha.toISOString().split('T')[0];
 
-    const fixtures = response.data.response.filter(jogo =>
-      leagueFiltro.has(jogo.league.id)
-    );
+    // Requisições para hoje e amanhã
+    const [resHoje, resAmanha] = await Promise.all([
+      axios.get('https://v3.football.api-sports.io/fixtures', {
+        headers: { 'x-apisports-key': API_TOKEN },
+        params: {
+          date: dataHoje,
+          timezone: 'America/Sao_Paulo'
+        }
+      }),
+      axios.get('https://v3.football.api-sports.io/fixtures', {
+        headers: { 'x-apisports-key': API_TOKEN },
+        params: {
+          date: dataAmanha,
+          timezone: 'America/Sao_Paulo'
+        }
+      })
+    ]);
 
-    // Buscar odds para cada jogo individualmente
+    // Junta os dois arrays
+    const fixtures = [...resHoje.data.response, ...resAmanha.data.response]
+      .filter(jogo => leagueFiltro.has(jogo.league.id));
+
     const jogosComOdds = await Promise.all(
       fixtures.map(async (jogo) => {
         try {
           const oddsResponse = await axios.get('https://v3.football.api-sports.io/odds', {
-            headers: {
-              'x-apisports-key': API_TOKEN
-            },
-            params: {
-              fixture: jogo.fixture.id
-            }
+            headers: { 'x-apisports-key': API_TOKEN },
+            params: { fixture: jogo.fixture.id }
           });
 
           const oddsData = oddsResponse.data.response?.[0];
@@ -73,7 +83,7 @@ router.get('/jogos-hoje', async (req, res) => {
           }, {}) || {};
 
           return {
-            id: jogo.fixture.id,
+            fixtureId: jogo.fixture.id,
             campeonato: jogo.league.name,
             timeCasa: jogo.teams.home.name,
             timeFora: jogo.teams.away.name,
@@ -83,25 +93,36 @@ router.get('/jogos-hoje', async (req, res) => {
             }),
             oddCasa: parseFloat(odds.home),
             oddEmpate: parseFloat(odds.draw),
-            oddFora: parseFloat(odds.away)
+            oddFora: parseFloat(odds.away),
+            oddsPersonalizadas: []
           };
         } catch (err) {
-          return null; // ignora se falhar
+          return null;
         }
       })
     );
 
     const jogosFiltrados = jogosComOdds.filter(j => j && j.oddCasa && j.oddEmpate && j.oddFora);
 
-    // Agrupar por campeonato (igual sua home principal)
+    // Salvar apenas os que ainda não existem
+    for (const jogo of jogosFiltrados) {
+      const existe = await Jogo.findOne({ fixtureId: jogo.fixtureId });
+      if (!existe) {
+        await Jogo.create(jogo);
+      }
+    }
+
+    // Buscar todos os jogos do banco
+    const jogosBD = await Jogo.find({});
+
     const campeonatos = {};
-    jogosFiltrados.forEach(jogo => {
+    jogosBD.forEach(jogo => {
       const camp = jogo.campeonato || 'Outros';
       if (!campeonatos[camp]) campeonatos[camp] = [];
       campeonatos[camp].push(jogo);
     });
 
-    res.render('jogos', { campeonatos }); // reutiliza a mesma view da rota "/"
+    res.render('jogos', { campeonatos });
 
   } catch (error) {
     console.error('Erro ao buscar jogos:', error.response?.data || error.message);

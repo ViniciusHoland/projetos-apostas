@@ -58,20 +58,15 @@
           <div><%= jogo.timeCasa %> x <%= jogo.timeFora %></div>
           <div>
             <small>
-              <strong>Data/Hora:</strong>
-              <% if (jogo.dataHora) { 
-                const [dataParte, horaParte] = jogo.dataHora.split(" - "); 
-                const [dia, mes, ano] = dataParte.split("/");
-              %>
-                <%= `${dia}/${mes}/${ano} ${horaParte}` %>
-              <% } else { %>
-                Data não disponível
-              <% } %>
+              <strong>Data/Hora: </strong><%= jogo.dataHora || "Data não disponível" %>
             </small>
           </div>
           <div>Odd: <strong><%= jogo.tipoOdd %></strong></div>
           <div class="d-flex justify-content-between">
-            <small>Status: <strong><%= jogo.status || "Aguardando" %></strong></small>
+            <small
+              >Status:
+              <strong><%= jogo.status || "Aguardando" %></strong></small
+            >
             <small><%= jogo.valorOdd.toFixed(2) %></small>
           </div>
         </div>
@@ -81,13 +76,16 @@
 
         <p><strong>Quantidade de Jogos:</strong> <%= bilhete.jogos.length %></p>
         <p>
-          <strong>Cotação:</strong> <%= bilhete.cotacaoTotal ? bilhete.cotacaoTotal.toFixed(2) : "---" %>
+          <strong>Cotação:</strong> <%= bilhete.cotacaoTotal ?
+          bilhete.cotacaoTotal.toFixed(2) : "---" %>
         </p>
         <p>
-          <strong>Total Apostado:</strong> R$ <%= bilhete.valorApostado.toFixed(2) %>
+          <strong>Total Apostado:</strong> R$ <%=
+          bilhete.valorApostado.toFixed(2) %>
         </p>
         <p>
-          <strong>Possível Retorno:</strong> R$ <%= bilhete.retornoEstimado.toFixed(2) %>
+          <strong>Possível Retorno:</strong> R$ <%=
+          bilhete.retornoEstimado.toFixed(2) %>
         </p>
       </div>
     </div>

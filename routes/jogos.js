@@ -78,6 +78,8 @@ router.post('/editar/:id', async (req, res) => {
 
     //console.log("tipo da data", req.body.dataHora);
 
+    //console.log('Odds recebidas:', req.body.oddsPersonalizadas);
+
 
     const rawDate = new Date(req.body.dataHora);
     const dia = String(rawDate.getDate()).padStart(2, '0');
@@ -88,7 +90,23 @@ router.post('/editar/:id', async (req, res) => {
 
     const dataFormatada = `${dia}/${mes}/${ano} - ${hora}:${minuto}`;
 
+    // Corrigir estrutura de oddsPersonalizadas (caso venham como objeto com índices)
+    let oddsArray = [];
+    if (req.body.oddsPersonalizadas) {
+      if (Array.isArray(req.body.oddsPersonalizadas)) {
+        oddsArray = req.body.oddsPersonalizadas;
+      } else {
+        oddsArray = Object.values(req.body.oddsPersonalizadas);
+      }
 
+      // Converter campos 'valor' para Number
+      oddsArray = oddsArray.map(odd => ({
+        descricao: odd.descricao,
+        valor: parseFloat(odd.valor)
+      }));
+    }
+
+    // Atualizar jogo no banco
     await Jogo.findByIdAndUpdate(req.params.id, {
       campeonato: req.body.campeonato,
       timeCasa: req.body.timeCasa,
@@ -97,7 +115,7 @@ router.post('/editar/:id', async (req, res) => {
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,
-      oddsPersonalizadas: req.body.oddsPersonalizadas
+      oddsPersonalizadas: oddsArray
     });
     res.redirect('/jogos');
   } catch (err) {

@@ -32,6 +32,9 @@
       </a>
 
       <h1 class="mb-4">Jogos do Dia</h1>
+      <button class="btn btn-info mb-3" onclick="buscarJogosDoDia()">
+        <i class="fas fa-sync-alt"></i> Atualizar Jogos do Dia
+      </button>
 
       <div class="row">
         <div class="col-md-8">
@@ -89,9 +92,10 @@
                     <% if (jogo.oddsPersonalizadas.length === 0) { %> - <% }
                     else { %>
                     <ul class="mb-0">
-                      <% jogo.oddsPersonalizadas.forEach(o => { const descLimpa
-                      = o.descricao.replace(/"/g, '&quot;').replace(/'/g,
-                      '&#39;'); %>
+                      <% jogo.oddsPersonalizadas.forEach(o => { const desc =
+                      o.descricao || ''; const descLimpa = desc.replace(/"/g,
+                      '&quot;').replace(/'/g, '&#39;'); %>
+
                       <li>
                         <button
                           class="btn btn-outline-primary btn-sm odd-btn"
@@ -142,7 +146,6 @@
             step="0.01"
             class="form-control mb-2"
             value=""
-
             oninput="atualizarRetorno()"
           />
 
@@ -169,6 +172,23 @@
     </div>
 
     <script>
+      function buscarJogosDoDia() {
+        if (confirm("Deseja atualizar os jogos de hoje?")) {
+          fetch("api/jogos-hoje")
+            .then((response) => {
+              if (response.ok) {
+                location.reload(); // Recarrega a página para mostrar os jogos
+              } else {
+                alert("Erro ao buscar jogos.");
+              }
+            })
+            .catch((err) => {
+              alert("Erro na comunicação com o servidor.");
+              console.error(err);
+            });
+        }
+      }
+
       const bilhete = [];
       const bilheteDiv = document.getElementById("bilhete");
       const btnFinalizar = document.getElementById("btnFinalizar");
@@ -374,9 +394,10 @@
       <p><strong>Total Apostado:</strong> R$ ${aposta.valorApostado.toFixed(
         2
       )}</p>
-      <p><strong>Possível Retorno:</strong> R$ ${aposta.retornoEstimado.toFixed(
+      <p><strong>Possível Retorno:</strong> R$ ${aposta.possivelRetorno.toFixed(
         2
       )}</p>
+
     </div>
   `;
 
