@@ -125,11 +125,6 @@ router.post('/bilhete/:id/status', async (req, res) => {
 
 
 
-
-
-
-
-
 router.get('/caixa', async (req, res) => {
   try {
     const apostas = await Aposta.find();

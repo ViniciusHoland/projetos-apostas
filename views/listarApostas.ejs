@@ -1,86 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-  <meta charset="UTF-8">
-  <title>Lista de Apostas</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Apostas</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-  <style>
-    .detalhes {
-      display: none;
-      margin-top: 10px;
-    }
-  </style>
-</head>
+    <style>
+      .detalhes {
+        display: none;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
 
-<body class="bg-light">
-  <div class="container mt-5">
-    
-    <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
-    <a href="/jogos" class="btn btn-info btn-lg">📋 Listar jogos</a>
-    <a href="/apostas/caixa" class="btn btn-warning text-dark">
+  <body class="bg-light">
+    <div class="container mt-5">
+      <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
+      <a href="/jogos" class="btn btn-info btn-lg">📋 Listar jogos</a>
+      <a href="/apostas/caixa" class="btn btn-warning text-dark">
         <i class="fas fa-box"></i> Caixa
-    </a>
+      </a>
 
-    <h2 class="mb-4">Apostas Registradas</h2>
+      <h2 class="mb-4">Apostas Registradas</h2>
 
-    <% if (apostas.length === 0) { %>
+      <% if (apostas.length === 0) { %>
       <div class="alert alert-info">Nenhuma aposta encontrada.</div>
-    <% } else { %>
+      <% } else { %>
       <div class="list-group">
         <% apostas.forEach(aposta => { %>
-          <div class="list-group-item mb-3 shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <strong><%= aposta.nomeCliente %></strong> <br>
-                <small><%= aposta.data %></small><br>
-                <small><%= aposta.jogos.length %> jogos | Total: R$ <%= aposta.valorApostado.toFixed(2) %></small>
-              </div>
-              <div>
-                <form action="/apostas/delete/<%= aposta._id %>" method="POST"
-                  onsubmit="return confirm('Tem certeza que deseja excluir esta aposta?')">
-                  <button class="btn btn-danger btn-sm">Excluir</button>
-                </form>
-              </div>
+        <div class="list-group-item mb-3 shadow-sm">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong><%= aposta.nomeCliente %></strong> <br />
+
+              <small>
+                <%= new Date(aposta.data).toLocaleString('pt-BR', { timeZone:
+                'America/Sao_Paulo', day: '2-digit', month: '2-digit', year:
+                'numeric', hour: '2-digit', minute: '2-digit' }) %> </small
+              ><br />
+              <small
+                ><%= aposta.jogos.length %> jogos | Total: R$ <%=
+                aposta.valorApostado.toFixed(2) %></small
+              >
             </div>
-            <button class="btn btn-link p-0 mt-2" onclick="toggleDetalhes('<%= aposta._id %>')">Ver Bilhete</button>
-            <div id="detalhes-<%= aposta._id %>" class="detalhes"></div>
+            <div>
+              <form
+                action="/apostas/delete/<%= aposta._id %>"
+                method="POST"
+                onsubmit="return confirm('Tem certeza que deseja excluir esta aposta?')"
+              >
+                <button class="btn btn-danger btn-sm">Excluir</button>
+              </form>
+            </div>
           </div>
+          <button
+            class="btn btn-link p-0 mt-2"
+            onclick="toggleDetalhes('<%= aposta._id %>')"
+          >
+            Ver Bilhete
+          </button>
+          <div id="detalhes-<%= aposta._id %>" class="detalhes"></div>
+        </div>
         <% }) %>
       </div>
-    <% } %>
-  </div>
+      <% } %>
+    </div>
 
-  <script>
-    function toggleDetalhes(id) {
-      const container = document.getElementById("detalhes-" + id);
-      if (container.style.display === "block") {
-        container.innerHTML = "";
-        container.style.display = "none";
-        return;
+    <script>
+      function toggleDetalhes(id) {
+        const container = document.getElementById("detalhes-" + id);
+        if (container.style.display === "block") {
+          container.innerHTML = "";
+          container.style.display = "none";
+          return;
+        }
+
+        fetch(`/apostas/${id}`)
+          .then((res) => res.json())
+          .then((aposta) => {
+            container.innerHTML = gerarBilheteVisual(aposta);
+            container.style.display = "block";
+          })
+          .catch((err) => {
+            console.error("Erro ao carregar bilhete:", err);
+            container.innerHTML =
+              '<p class="text-danger">Erro ao carregar bilhete.</p>';
+            container.style.display = "block";
+          });
       }
 
-      fetch(`/apostas/${id}`)
-        .then(res => res.json())
-        .then(aposta => {
-          container.innerHTML = gerarBilheteVisual(aposta);
-          container.style.display = "block";
-        })
-        .catch(err => {
-          console.error("Erro ao carregar bilhete:", err);
-          container.innerHTML = '<p class="text-danger">Erro ao carregar bilhete.</p>';
-          container.style.display = "block";
+      function formatarDataHora(dataISO) {
+        const data = new Date(dataISO);
+        return data.toLocaleString("pt-BR", {
+          timeZone: "America/Sao_Paulo",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
         });
-    }
+      }
 
-    function gerarBilheteVisual(aposta) {
-      const linkBilhete = `${window.location.origin}/apostas/bilhete/${aposta._id}`;
+      function gerarBilheteVisual(aposta) {
+        const linkBilhete = `${window.location.origin}/apostas/bilhete/${aposta._id}`;
 
-      return `
+        return `
       <div class="border p-3 bg-light mt-3 shadow-sm" style="max-width: 380px; margin: auto;">
 
         <div class="alert alert-success text-center">
@@ -96,9 +126,11 @@
           <strong>COTAÇÃO</strong>
         </div>
         <hr/>
-        ${aposta.jogos.map(jogo => `
+        ${aposta.jogos
+          .map(
+            (jogo) => `
         <div>
-          <strong>Futebol - ${jogo.dataHora}</strong><br/>
+          <strong>Futebol - ${formatarDataHora(jogo.dataHora)}</strong><br/>
           ${jogo.campeonato || "Campeonato"}<br/>
           ${jogo.jogoNome || "---"}<br/>
           Resultado: <strong>${jogo.tipoOdd || "---"}</strong><br/>
@@ -108,33 +140,51 @@
           </div>
           <label for="status-${jogo._id}" class="form-label">Status:</label>
           <select id="status-${jogo._id}" class="form-select form-select-sm"
-            onchange="atualizarStatus('${aposta._id}', '${jogo._id}', this.value)">
-            <option value="Aguardando" ${jogo.status === "Aguardando" ? "selected" : ""}>Aguardando</option>
-            <option value="Acertou" ${jogo.status === "Acertou" ? "selected" : ""}>Acertou</option>
-            <option value="Perdeu" ${jogo.status === "Perdeu" ? "selected" : ""}>Perdeu</option>
+            onchange="atualizarStatus('${aposta._id}', '${
+              jogo._id
+            }', this.value)">
+            <option value="Aguardando" ${
+              jogo.status === "Aguardando" ? "selected" : ""
+            }>Aguardando</option>
+            <option value="Acertou" ${
+              jogo.status === "Ganhou" ? "selected" : ""
+            }>Acertou</option>
+            <option value="Perdeu" ${
+              jogo.status === "Perdeu" ? "selected" : ""
+            }>Perdeu</option>
           </select>
           <hr/>
-        </div>`).join("")}
+        </div>`
+          )
+          .join("")}
         <p><strong>Quantidade de Jogos:</strong> ${aposta.jogos.length}</p>
-        <p><strong>Cotação:</strong> ${aposta.cotacaoFinal?.toFixed(2) || "---"}</p>
-        <p><strong>Total Apostado:</strong> R$ ${aposta.valorApostado?.toFixed(2) || "0.00"}</p>
-        <p><strong>Possível Retorno:</strong> R$ ${aposta.retornoEstimado?.toFixed(2) || "0.00"} </p>
+        <p><strong>Cotação:</strong> ${
+          aposta.cotacaoFinal?.toFixed(2) || "---"
+        }</p>
+        <p><strong>Total Apostado:</strong> R$ ${
+          aposta.valorApostado?.toFixed(2) || "0.00"
+        }</p>
+        <p><strong>Possível Retorno:</strong> R$ ${
+          aposta.retornoEstimado?.toFixed(2) || "0.00"
+        } </p>
       </div>`;
-    }
+      }
 
-    function atualizarStatus(apostaId, jogoId, status) {
-      fetch(`/apostas/${apostaId}/jogo/${jogoId}/status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log("✅ Status atualizado:", data);
-        alert("Status atualizado com sucesso!");
-      })
-      .catch(error => console.error("❌ Erro ao atualizar status:", error));
-    }
-  </script>
-</body>
+      function atualizarStatus(apostaId, jogoId, status) {
+        fetch(`/apostas/${apostaId}/jogo/${jogoId}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("✅ Status atualizado:", data);
+            alert("Status atualizado com sucesso!");
+          })
+          .catch((error) =>
+            console.error("❌ Erro ao atualizar status:", error)
+          );
+      }
+    </script>
+  </body>
 </html>

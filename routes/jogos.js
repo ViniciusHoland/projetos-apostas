@@ -8,21 +8,14 @@ router.post('/cadastro', async (req, res) => {
 
     //console.log("dados recebidos ", req.body);
 
-
-    const rawDate = new Date(req.body.dataHora);
-    const dia = String(rawDate.getDate()).padStart(2, '0');
-    const mes = String(rawDate.getMonth() + 1).padStart(2, '0'); // Janeiro = 0
-    const ano = rawDate.getFullYear();
-    const hora = String(rawDate.getHours()).padStart(2, '0');
-    const minuto = String(rawDate.getMinutes()).padStart(2, '0');
-
-    const dataFormatada = `${dia}/${mes}/${ano} - ${hora}:${minuto}`;
+    const moment = require('moment-timezone'); // adicione no topo do arquivo
+    const dataHoraBrasilia = moment.tz(req.body.dataHora, 'America/Sao_Paulo').toDate();
 
     const novoJogo = new Jogo({
       campeonato: req.body.campeonato,
       timeCasa: req.body.timeCasa,
       timeFora: req.body.timeFora,
-      dataHora: dataFormatada,
+      dataHora: dataHoraBrasilia,
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,
@@ -35,6 +28,8 @@ router.post('/cadastro', async (req, res) => {
     res.status(500).send('Erro ao salvar jogo');
   }
 });
+
+
 
 // GET - Listar todos os jogos agrupados por campeonato
 router.get('/', async (req, res) => {
@@ -81,14 +76,9 @@ router.post('/editar/:id', async (req, res) => {
     //console.log('Odds recebidas:', req.body.oddsPersonalizadas);
 
 
-    const rawDate = new Date(req.body.dataHora);
-    const dia = String(rawDate.getDate()).padStart(2, '0');
-    const mes = String(rawDate.getMonth() + 1).padStart(2, '0'); // Janeiro = 0
-    const ano = rawDate.getFullYear();
-    const hora = String(rawDate.getHours()).padStart(2, '0');
-    const minuto = String(rawDate.getMinutes()).padStart(2, '0');
+    const moment = require('moment-timezone'); // adicione no topo do arquivo
 
-    const dataFormatada = `${dia}/${mes}/${ano} - ${hora}:${minuto}`;
+    const dataHoraBrasilia = moment.tz(req.body.dataHora, 'America/Sao_Paulo').toDate();
 
     // Corrigir estrutura de oddsPersonalizadas (caso venham como objeto com índices)
     let oddsArray = [];
@@ -111,7 +101,7 @@ router.post('/editar/:id', async (req, res) => {
       campeonato: req.body.campeonato,
       timeCasa: req.body.timeCasa,
       timeFora: req.body.timeFora,
-      dataHora: dataFormatada,
+      dataHora: dataHoraBrasilia,
       oddCasa: req.body.oddCasa,
       oddEmpate: req.body.oddEmpate,
       oddFora: req.body.oddFora,

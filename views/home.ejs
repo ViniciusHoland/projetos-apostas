@@ -24,6 +24,7 @@
   <body class="bg-light">
     <div class="container mt-5">
       <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
+
       <a href="/apostas" class="btn btn-success btn-lg px-4">
         <i class="fas fa-futbol"></i> Apostas
       </a>
@@ -62,7 +63,12 @@
                 dataHoraFormatada = jogo.dataHora; const dataHoraISO =
                 jogo.dataHora; // você pode renomear se quiser %>
                 <tr>
-                  <td><%= dataHoraFormatada %></td>
+                  <td>
+                    <%= new Date(jogo.dataHora).toLocaleString('pt-BR', {
+                    timeZone: 'America/Sao_Paulo', day: '2-digit', month:
+                    '2-digit', year: 'numeric', hour: '2-digit', minute:
+                    '2-digit' }) %>
+                  </td>
                   <td><%= nomeJogo %></td>
                   <td>
                     <button
@@ -91,22 +97,22 @@
                   <td>
                     <% if (jogo.oddsPersonalizadas.length === 0) { %> - <% }
                     else { %>
-                    <ul class="mb-0">
+                    <div class="d-flex flex-wrap gap-1">
                       <% jogo.oddsPersonalizadas.forEach(o => { const desc =
                       o.descricao || ''; const descLimpa = desc.replace(/"/g,
                       '&quot;').replace(/'/g, '&#39;'); %>
-
-                      <li>
-                        <button
-                          class="btn btn-outline-primary btn-sm odd-btn"
-                          onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
+                      <button
+                        class="btn btn-outline-secondary btn-sm"
+                        style="min-width: 150px"
+                        onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
+                      >
+                        <small
+                          ><strong><%= o.descricao %></strong>: <%=
+                          Number(o.valor).toFixed(2) %></small
                         >
-                          <strong><%= o.descricao %></strong>: <%=
-                          Number(o.valor).toFixed(2) %>
-                        </button>
-                      </li>
+                      </button>
                       <% }) %>
-                    </ul>
+                    </div>
                     <% } %>
                   </td>
                   <td class="text-center">
@@ -172,6 +178,20 @@
     </div>
 
     <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const bilheteSalvo = localStorage.getItem("bilhete");
+        if (bilheteSalvo) {
+          try {
+            const bilheteRestaurado = JSON.parse(bilheteSalvo);
+            bilhete.push(...bilheteRestaurado);
+            renderBilhete();
+            atualizarRetorno();
+          } catch (e) {
+            console.error("Erro ao carregar bilhete do localStorage", e);
+          }
+        }
+      });
+
       function buscarJogosDoDia() {
         if (confirm("Deseja atualizar os jogos de hoje?")) {
           fetch("api/jogos-hoje")
@@ -187,6 +207,10 @@
               console.error(err);
             });
         }
+      }
+
+      function salvarBilheteLocal() {
+        localStorage.setItem("bilhete", JSON.stringify(bilhete));
       }
 
       const bilhete = [];
@@ -221,12 +245,14 @@
         });
         renderBilhete();
         atualizarRetorno();
+        salvarBilheteLocal();
       }
 
       function removerDoBilhete(index) {
         bilhete.splice(index, 1);
         renderBilhete();
         atualizarRetorno();
+        salvarBilheteLocal();
       }
 
       function renderBilhete() {
@@ -271,8 +297,8 @@
         );
 
         let retorno = produtoOdds * valorTotal;
-        if (retorno > 1500) {
-          retorno = 1500;
+        if (retorno > 2000) {
+          retorno = 2000;
         }
         retornoEstimadoSpan.textContent = retorno.toFixed(2);
       }
@@ -301,8 +327,8 @@
         );
         let possivelRetorno = cotacaoTotal * valorTotal;
 
-        if (possivelRetorno > 1500) {
-          possivelRetorno = 1500;
+        if (possivelRetorno > 2000) {
+          possivelRetorno = 2000;
         }
 
         const aposta = {
@@ -356,12 +382,16 @@
         renderBilhete();
         valorTotalInput.value = 0;
         atualizarRetorno();
+        localStorage.removeItem("bilhete");
       }
 
       function gerarBilheteVisual(aposta) {
         const bilheteHtml = `
     <div class="border p-3 bg-light mt-3 shadow" id="bilhete-finalizado" style="max-width: 400px; margin: auto;">
-      <p><strong>DATA:</strong> ${new Date(aposta.data).toLocaleString()}</p>
+      <p><strong>DATA:</strong> ${new Date(aposta.data).toLocaleString(
+        "pt-BR",
+        { timeZone: "America/Sao_Paulo" }
+      )}</p>
       <p><strong>COLABORADOR:</strong> Vinicius00</p>
       <p><strong>CLIENTE:</strong> ${aposta.nomeCliente}</p>
       <hr/>

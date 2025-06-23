@@ -41,13 +41,12 @@
       <div class="mb-3">
         <label for="dataHora" class="form-label">Data e Hora</label>
         <% const dataHoraOriginal = new Date(jogo.dataHora || Date.now()); const
-        ano = dataHoraOriginal.getUTCFullYear(); const mes =
-        String(dataHoraOriginal.getUTCMonth() + 1).padStart(2, '0'); const dia =
-        String(dataHoraOriginal.getUTCDate()).padStart(2, '0'); const horas =
-        String(dataHoraOriginal.getUTCHours()).padStart(2, '0'); const minutos =
-        String(dataHoraOriginal.getUTCMinutes()).padStart(2, '0'); const
+        ano = dataHoraOriginal.getFullYear(); // ✅ agora usa horário local
+        const mes = String(dataHoraOriginal.getMonth() + 1).padStart(2, '0');
+        const dia = String(dataHoraOriginal.getDate()).padStart(2, '0'); const
+        horas = String(dataHoraOriginal.getHours()).padStart(2, '0'); const
+        minutos = String(dataHoraOriginal.getMinutes()).padStart(2, '0'); const
         dataFinal = `${ano}-${mes}-${dia}T${horas}:${minutos}`; %>
-
         <input
           type="datetime-local"
           id="dataHora"

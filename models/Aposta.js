@@ -9,7 +9,7 @@ const jogoApostadoSchema = new mongoose.Schema({
   dataHora: String,
   status: {
     type: String,
-    default: 'Aguardando'
+    default: 'Aberta'
   }
 });
 

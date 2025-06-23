@@ -58,16 +58,21 @@
           <div><%= jogo.timeCasa %> x <%= jogo.timeFora %></div>
           <div>
             <small>
-              <strong>Data/Hora: </strong><%= jogo.dataHora || "Data não disponível" %>
+              <strong>Data/Hora: </strong><%= new
+              Date(jogo.dataHora).toLocaleString('pt-BR', { timeZone:
+              'America/Sao_Paulo', day: '2-digit', month: '2-digit', year:
+              'numeric', hour: '2-digit', minute: '2-digit' }) %>
             </small>
           </div>
           <div>Odd: <strong><%= jogo.tipoOdd %></strong></div>
-          <div class="d-flex justify-content-between">
-            <small
-              >Status:
-              <strong><%= jogo.status || "Aguardando" %></strong></small
-            >
+          
+          <div class="text-end">
             <small><%= jogo.valorOdd.toFixed(2) %></small>
+          </div>
+          <div class="text-end">
+            
+             <strong class="text-end"><%= jogo.status || "Aberta" %></strong>
+            
           </div>
         </div>
         <% }) %>

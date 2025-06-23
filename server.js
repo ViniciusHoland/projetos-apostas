@@ -1,18 +1,23 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const axios = require('axios'); // Se ainda não estiver usando
 require('dotenv').config();
 
 const app = express();
 
 // ====== CONTROLE DE INATIVIDADE ======
-let ultimaRequisicao = Date.now();
-
-// Middleware que registra o horário da última requisição
-app.use((req, res, next) => {
-  ultimaRequisicao = Date.now();
-  next();
-});
+setInterval(() => {
+  const url = 'https://banca-bets.onrender.com/jogos'; // substitua pela URL real do seu app no Render
+  axios.get(url)
+    .then(() => {
+    const dataAtual = new Date();
+console.log('Ping enviado para manter o servidor ativo em:', dataAtual.toLocaleString('pt-BR'));
+    })
+    .catch((err) => {
+      console.error('Erro ao enviar ping:', err.message);
+    });
+}, 14 * 60 * 1000); // a cada 14 minutos
 
 
 // Middlewares
@@ -37,24 +42,10 @@ app.use('/jogos', jogosRoutes);
 app.use('/apostas', apostasRoutes);
 app.use('/', saida);
 
-
-
-// Verifica a cada 10 minutos se já passou 2h sem acesso
-setInterval(() => {
-  const agora = Date.now();
-  const duasHoras = 2 * 60 * 60 * 1000;
-
-  if (agora - ultimaRequisicao > duasHoras) {
-    console.log('Mais de 2 horas sem atividade. Encerrando servidor...');
-    process.exit(); // Render entrará em modo sleeping
-  }
-}, 10 * 60 * 1000); // Verifica a cada 10 minutos
-
-// Página inicial
 app.get('/', (req, res) => {
-  //res.sendFile(path.join(__dirname, 'views', 'index.html'));
-  res.render('index'); 
+  res.render('index'); // ou res.redirect('/jogos') se quiser redirecionar
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
