@@ -143,12 +143,12 @@
             onchange="atualizarStatus('${aposta._id}', '${
               jogo._id
             }', this.value)">
-            <option value="Aguardando" ${
-              jogo.status === "Aguardando" ? "selected" : ""
-            }>Aguardando</option>
+            <option value="Aberta" ${
+              jogo.status === "Aberta" ? "selected" : ""
+            }>Aberta</option>
             <option value="Ganhou" ${
               jogo.status === "Ganhou" ? "selected" : ""
-            }>Acertou</option>
+            }>Ganhou</option>
             <option value="Perdeu" ${
               jogo.status === "Perdeu" ? "selected" : ""
             }>Perdeu</option>

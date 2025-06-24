@@ -42,7 +42,7 @@ router.post('/apostar', async (req, res) => {
       jogoNome: jogo.jogoNome || '---',
       tipoOdd: jogo.tipoOdd || '---',
       valorOdd: jogo.valorOdd || 0,
-      status: jogo.status && jogo.status !== '' ? jogo.status : 'Aguardando',
+      status: jogo.status && jogo.status !== '' ? jogo.status : 'Aberta',
       dataHora: jogo.dataHora || 'Data não disponível' // Mantém como string
     }));
 
