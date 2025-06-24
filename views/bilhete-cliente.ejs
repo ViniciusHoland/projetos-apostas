@@ -9,7 +9,7 @@
     />
     <style>
       * {
-        font-size: 18px;
+        font-size: 17px;
       }
       .bilhete {
         background-color: #fff9c4; /* amarelo claro */
@@ -31,10 +31,35 @@
         border-bottom: 1px dashed #bbb;
         padding: 5px 0;
       }
+      @media print {
+        body {
+          background: white;
+        }
+        .bilhete {
+          max-width: 58mm; /* largura típica para mini impressora */
+          margin: 0 auto;
+          box-shadow: none;
+          border: none;
+          font-size: 10px; /* fonte menor para caber bem */
+        }
+        .no-print {
+          display: none; /* esconde o botão ao imprimir */
+        }
+      }
     </style>
   </head>
   <body class="bg-light">
     <div class="container">
+      <div class="text-center my-3 no-print">
+        <a
+          href="/apostas/bilhete/<%= bilhete._id %>/print"
+          target="_blank"
+          class="btn btn-success"
+        >
+          <i class="fas fa-print"></i> Imprimir Bilhete
+        </a>
+      </div>
+
       <div class="bilhete">
         <div class="linha">
           <strong>DATA:</strong>

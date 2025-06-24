@@ -63,6 +63,18 @@ router.post('/apostar', async (req, res) => {
   }
 });
 
+router.get('/bilhete/:id/print', async (req, res) => {
+  try {
+
+    const bilhete = await Aposta.findById(req.params.id);
+    if (!bilhete) return res.status(404).send('Bilhete não encontrado');
+
+    res.render('printbilhete', { bilhete });
+  } catch (error) {
+    res.status(500).send('Erro ao carregar bilhete para impressão');
+  }
+});
+
 
 router.get('/bilhete/:id', async (req, res) => {
   try {
@@ -79,6 +91,8 @@ router.get('/bilhete/:id', async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 });
+
+
 
 
 router.post('/:apostaId/jogo/:jogoId/status', async (req, res) => {
