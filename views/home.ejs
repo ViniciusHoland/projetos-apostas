@@ -103,7 +103,7 @@
                       '&quot;').replace(/'/g, '&#39;'); %>
                       <button
                         class="btn btn-outline-secondary btn-sm"
-                        style="min-width: 150px"
+                        style="min-width: 120px"
                         onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
                       >
                         <small
@@ -413,7 +413,7 @@
             <span></span>
             <span>${jogo.valorOdd.toFixed(2)}</span>
           </div>
-          <p>Status: ${jogo.status || "Aguardando"}</p>
+          <p>Status: ${jogo.status || "Aberta"}</p>
           <hr/>
         </div>
       `

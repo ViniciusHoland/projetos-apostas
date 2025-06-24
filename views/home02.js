@@ -363,7 +363,7 @@
             <span></span>
             <span>${jogo.valorOdd.toFixed(2)}</span>
           </div>
-          <p>Status: ${jogo.status || "Aguardando"}</p>
+          <p>Status: ${jogo.status || "Aberta"}</p>
           <hr/>
         </div>
       `

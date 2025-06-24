@@ -11,11 +11,9 @@ router.get('/leagues', async (req, res) => {
       headers: {
         'x-apisports-key': API_TOKEN
       },
-      params: {
-        season: '2025'
-      }
     });
-    const leagues = response.data.response;
+
+    const leagues = response?.data?.response || [];
 
     leagues.forEach(league => {
       console.log(`ID: ${league.league.id}, Name: ${league.league.name}, Country: ${league.country.name}`);
@@ -25,34 +23,53 @@ router.get('/leagues', async (req, res) => {
 
   } catch (error) {
     console.error(error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Erro ao buscar ligas.' });
   }
-})
+});
+
+
+
 /*
+2 -UEFA Champions League
+11 - sudamericana
+13 - libertadores 
 15 → FIFA Club World Cup (World)
+39 - premier league - ingles 
 72 → Serie A (Brazil)
 71 → Serie B (Brazil)
-363 → Paulista A1 (Brazil)
-265 → Copa do Brasil (Brazil)
-239 → Libertadores (South America)
-907 → Copa Sudamericana (South America)
+73 - copa do brasil
+129  - primeira nacional - argentina 
+135: 'Serie A (Itália)',
+140: 'La Liga (Espanha)',
+265 → Primera División" - chile 
+239 → primera A - colombia 
 
 */
 
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
-const leagueFiltro = new Set([15, 72, 71, 363, 265, 239, 907]);
+const leagueFiltro = new Set([ 2, 11 , 13, 15, 39 , 71, 72, 73, 129, 135, 140, 265, 239]);
 const CASA_DE_APOSTA = '1xBet'; // nome da casa
-const FATOR_REDUCAO = 0.85; // reduz odds em 20%
+const FATOR_REDUCAO = 0.80; // reduz odds em 20%
 const FATOR_REDUCAO_PLACAR = 0.70; // reduz odds em 30%
 
 const ligasTraduzidas = {
-  15: 'Premier League (Inglês)',
-  71: 'Ligue 1 (Francês)',
-  72: 'Serie A (Italiano)',
-  363: 'Bundesliga (Alemão)',
-  265: 'Primeira Liga (Português)',
-  239: 'La Liga (Espanhol)',
-  907: 'Liga dos Campeões da UEFA'
+  15: 'FIFA Copa do Mundo de Clubes',
+  71: 'Brasil - Brasileirão Série B',
+  72: 'Brasil - Brasileirão Série A',
+  265: 'Primera División - Chile ',
+  140: 'La Liga (Espanhol)',
+  2: 'Liga dos Campeões da UEFA',
+  11: 'Copa Sul-Americana',
+  13: 'Libertadores',
+  39: 'Premier League (Inglaterra)',
+  73: 'Copa do Brasil',
+  135: 'Serie A (Itália)',
+  239: 'Primeira A - Colombia '
 };
+
+function limitarOdd(valor, maximo = 12) {
+  return Math.min(parseFloat(valor), maximo).toFixed(2);
+}
 
 router.get('/jogos-hoje', async (req, res) => {
   try {
@@ -82,9 +99,9 @@ router.get('/jogos-hoje', async (req, res) => {
           const mercadoPrincipal = bm.bets.find(bet => bet.name === 'Match Winner');
 
           const odds = mercadoPrincipal?.values.reduce((acc, v) => {
-            if (v.value === 'Home') acc.home = parseFloat(v.odd) * FATOR_REDUCAO;
-            if (v.value === 'Draw') acc.draw = parseFloat(v.odd) * FATOR_REDUCAO;
-            if (v.value === 'Away') acc.away = parseFloat(v.odd) * FATOR_REDUCAO;
+            if (v.value === 'Home') acc.home = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
+            if (v.value === 'Draw') acc.draw = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
+            if (v.value === 'Away') acc.away = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
             return acc;
           }, {}) || {};
 
@@ -96,7 +113,7 @@ router.get('/jogos-hoje', async (req, res) => {
               const traducao = item.value === 'Yes' ? 'Sim' : 'Não';
               oddsPersonalizadas.push({
                 descricao: `Ambos Marcam: ${traducao}`,
-                valor: (parseFloat(item.odd) * FATOR_REDUCAO).toFixed(2)
+                valor: limitarOdd(parseFloat(item.odd) * FATOR_REDUCAO)
               });
 
               if (item.value === 'Yes') {
@@ -110,7 +127,7 @@ router.get('/jogos-hoje', async (req, res) => {
                     if (vencedor && vencedor !== 'Empate') {
                       oddsPersonalizadas.push({
                         descricao: `Ambos Marcam: Sim + ${vencedor} Vence`,
-                        valor: (parseFloat(item.odd) * parseFloat(v.odd) * FATOR_REDUCAO).toFixed(2)
+                        valor: limitarOdd(parseFloat(item.odd) * parseFloat(v.odd) * FATOR_REDUCAO)
                       });
                     }
                   });
@@ -125,33 +142,35 @@ router.get('/jogos-hoje', async (req, res) => {
             if (over25) {
               oddsPersonalizadas.push({
                 descricao: 'Mais de 2.5 Gols',
-                valor: (parseFloat(over25.odd) * FATOR_REDUCAO).toFixed(2)
+                valor: limitarOdd(parseFloat(over25.odd) * FATOR_REDUCAO)
               });
             }
           }
 
           const resultadoExato = bm.bets.find(bet => bet.name === 'Exact Score');
           if (resultadoExato?.values?.length) {
-            const placaresDesejados = ['2:1', '3:1', '1:1', '1:2'];
+            const placaresDesejados = ['2:1', '3:1', '1:1', '1:2', '1:3','2:0','0:2' , '1:0', '0:1'];
             resultadoExato.values.forEach(v => {
               if (placaresDesejados.includes(v.value)) {
                 oddsPersonalizadas.push({
                   descricao: `Placar Exato: ${v.value}`,
-                  valor: (parseFloat(v.odd) * FATOR_REDUCAO_PLACAR).toFixed(2)
+                  valor: limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO_PLACAR)
                 });
               }
             });
           }
 
+          const nomeCampeonato = ligasTraduzidas[jogo.league.id] || jogo.league.name;
+
           return {
             fixtureId: jogo.fixture.id,
-            campeonato: jogo.league.name,
+            campeonato: nomeCampeonato,
             timeCasa: jogo.teams.home.name,
             timeFora: jogo.teams.away.name,
             dataHora: new Date(jogo.fixture.date),
-            oddCasa: parseFloat(odds.home?.toFixed(2)),
-            oddEmpate: parseFloat(odds.draw?.toFixed(2)),
-            oddFora: parseFloat(odds.away?.toFixed(2)),
+            oddCasa: parseFloat(odds.home),
+            oddEmpate: parseFloat(odds.draw),
+            oddFora: parseFloat(odds.away),
             oddsPersonalizadas
           };
         } catch (err) {
