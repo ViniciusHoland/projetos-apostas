@@ -56,6 +56,15 @@ router.get('/editar/:id', async (req, res) => {
   try {
     const jogo = await Jogo.findById(req.params.id);
     if (!jogo) return res.status(404).send('Jogo não encontrado');
+
+
+     // ⚠️ Corrige a data antes de enviar para a view
+    const dataUTC = new Date(jogo.dataHora);
+    const offset = dataUTC.getTimezoneOffset(); // minutos
+    const dataHoraLocal = new Date(dataUTC.getTime() - offset * 60 * 1000);
+    jogo.dataHoraLocalFormatada = dataHoraLocal.toISOString().slice(0, 16); // formato yyyy-MM-ddTHH:mm
+
+
     res.render('editarJogo', { jogo });
   } catch (err) {
     console.error(err);

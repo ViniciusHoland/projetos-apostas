@@ -27,15 +27,9 @@
     <!-- Data e Hora -->
     <div class="mb-3">
       <label for="dataHora" class="form-label">Data e Hora</label>
-      <% const dataUTC=new Date(jogo.dataHora || Date.now()); const offset=dataUTC.getTimezoneOffset(); // minutos const
-        dataHoraLocal=new Date(dataUTC.getTime() - offset * 60 * 1000); const ano=dataHoraLocal.getFullYear(); const
-        mes=String(dataHoraLocal.getMonth() + 1).padStart(2, '0' ); const
-        dia=String(dataHoraLocal.getDate()).padStart(2, '0' ); const
-        horas=String(dataHoraLocal.getHours()).padStart(2, '0' ); const
-        minutos=String(dataHoraLocal.getMinutes()).padStart(2, '0' ); const
-        dataFinal=`${ano}-${mes}-${dia}T${horas}:${minutos}`; %>
-        <input type="datetime-local" id="dataHora" name="dataHora" class="form-control" value="<%= dataFinal %>"
-          required />
+    
+        <input type="datetime-local" id="dataHora" name="dataHora" class="form-control"
+          value="<%= jogo.dataHoraLocalFormatada %>" required />
     </div>
 
     <!-- Odds padrão -->
