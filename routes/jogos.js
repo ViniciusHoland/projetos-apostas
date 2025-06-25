@@ -50,6 +50,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+const { DateTime } = require('luxon');
 
 // GET - Página de edição
 router.get('/editar/:id', async (req, res) => {
@@ -57,17 +58,13 @@ router.get('/editar/:id', async (req, res) => {
     const jogo = await Jogo.findById(req.params.id);
     if (!jogo) return res.status(404).send('Jogo não encontrado');
 
-    const dataUTC = new Date(jogo.dataHora);
-    const offsetMin = dataUTC.getTimezoneOffset();
-    const dataLocal = new Date(dataUTC.getTime() - offsetMin * 60000);
+    // Converte data UTC para fuso de São Paulo e formato do input datetime-local
+    const dataHoraLocalFormatada = DateTime
+      .fromJSDate(jogo.dataHora, { zone: 'utc' })  // trata como UTC
+      .setZone('America/Sao_Paulo')                // converte para São Paulo
+      .toFormat("yyyy-LL-dd'T'HH:mm");             // formato para o input
 
-    const ano = dataLocal.getFullYear();
-    const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
-    const dia = String(dataLocal.getDate()).padStart(2, '0');
-    const horas = String(dataLocal.getHours()).padStart(2, '0');
-    const minutos = String(dataLocal.getMinutes()).padStart(2, '0');
-
-    jogo.dataHoraLocalFormatada = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+    jogo.dataHoraLocalFormatada = dataHoraLocalFormatada;
 
 
     res.render('editarJogo', { jogo });
