@@ -57,8 +57,10 @@ router.get('/editar/:id', async (req, res) => {
     const jogo = await Jogo.findById(req.params.id);
     if (!jogo) return res.status(404).send('Jogo não encontrado');
 
+    const dataUTC = new Date(jogo.dataHora);
+    const offsetMin = dataUTC.getTimezoneOffset();
+    const dataLocal = new Date(dataUTC.getTime() - offsetMin * 60000);
 
-    const dataLocal = new Date(jogo.dataHora);
     const ano = dataLocal.getFullYear();
     const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
     const dia = String(dataLocal.getDate()).padStart(2, '0');
