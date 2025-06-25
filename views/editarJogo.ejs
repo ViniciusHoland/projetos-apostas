@@ -1,156 +1,100 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Editar Jogo</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="container mt-5">
-    <h1>Editar Jogo</h1>
-    <form action="/jogos/editar/<%= jogo._id %>" method="POST">
-      <!-- Time Casa -->
-      <div class="mb-3">
-        <label for="timeCasa" class="form-label">Time Casa</label>
-        <input
-          type="text"
-          id="timeCasa"
-          name="timeCasa"
-          class="form-control"
-          value="<%= jogo.timeCasa ?? '' %>"
-          required
-        />
-      </div>
 
-      <!-- Time Fora -->
-      <div class="mb-3">
-        <label for="timeFora" class="form-label">Time Fora</label>
-        <input
-          type="text"
-          id="timeFora"
-          name="timeFora"
-          class="form-control"
-          value="<%= jogo.timeFora ?? '' %>"
-          required
-        />
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Editar Jogo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
 
-      <!-- Data e Hora -->
-      <div class="mb-3">
-        <label for="dataHora" class="form-label">Data e Hora</label>
-        <% const dataHoraOriginal = new Date(jogo.dataHora || Date.now()); const
-        ano = dataHoraOriginal.getFullYear(); // ✅ agora usa horário local
-        const mes = String(dataHoraOriginal.getMonth() + 1).padStart(2, '0');
-        const dia = String(dataHoraOriginal.getDate()).padStart(2, '0'); const
-        horas = String(dataHoraOriginal.getHours()).padStart(2, '0'); const
-        minutos = String(dataHoraOriginal.getMinutes()).padStart(2, '0'); const
-        dataFinal = `${ano}-${mes}-${dia}T${horas}:${minutos}`; %>
-        <input
-          type="datetime-local"
-          id="dataHora"
-          name="dataHora"
-          class="form-control"
-          value="<%= dataFinal %>"
-          required
-        />
-      </div>
+<body class="container mt-5">
+  <h1>Editar Jogo</h1>
+  <form action="/jogos/editar/<%= jogo._id %>" method="POST">
+    <!-- Time Casa -->
+    <div class="mb-3">
+      <label for="timeCasa" class="form-label">Time Casa</label>
+      <input type="text" id="timeCasa" name="timeCasa" class="form-control" value="<%= jogo.timeCasa ?? '' %>"
+        required />
+    </div>
 
-      <!-- Odds padrão -->
-      <div class="mb-3">
-        <label for="oddCasa" class="form-label">Odd Casa</label>
-        <input
-          type="number"
-          step="0.01"
-          id="oddCasa"
-          name="oddCasa"
-          class="form-control"
-          value="<%= jogo.oddCasa ?? '' %>"
-          required
-        />
-      </div>
+    <!-- Time Fora -->
+    <div class="mb-3">
+      <label for="timeFora" class="form-label">Time Fora</label>
+      <input type="text" id="timeFora" name="timeFora" class="form-control" value="<%= jogo.timeFora ?? '' %>"
+        required />
+    </div>
 
-      <div class="mb-3">
-        <label for="oddEmpate" class="form-label">Odd Empate</label>
-        <input
-          type="number"
-          step="0.01"
-          id="oddEmpate"
-          name="oddEmpate"
-          class="form-control"
-          value="<%= jogo.oddEmpate ?? '' %>"
-          required
-        />
-      </div>
+    <!-- Data e Hora -->
+    <div class="mb-3">
+      <label for="dataHora" class="form-label">Data e Hora</label>
+      <% const dataUTC=new Date(jogo.dataHora || Date.now()); const offset=dataUTC.getTimezoneOffset(); // minutos const
+        dataHoraLocal=new Date(dataUTC.getTime() - offset * 60 * 1000); const ano=dataHoraLocal.getFullYear(); const
+        mes=String(dataHoraLocal.getMonth() + 1).padStart(2, '0' ); const
+        dia=String(dataHoraLocal.getDate()).padStart(2, '0' ); const
+        horas=String(dataHoraLocal.getHours()).padStart(2, '0' ); const
+        minutos=String(dataHoraLocal.getMinutes()).padStart(2, '0' ); const
+        dataFinal=`${ano}-${mes}-${dia}T${horas}:${minutos}`; %>
+        <input type="datetime-local" id="dataHora" name="dataHora" class="form-control" value="<%= dataFinal %>"
+          required />
+    </div>
 
-      <div class="mb-3">
-        <label for="oddFora" class="form-label">Odd Fora</label>
-        <input
-          type="number"
-          step="0.01"
-          id="oddFora"
-          name="oddFora"
-          class="form-control"
-          value="<%= jogo.oddFora ?? '' %>"
-          required
-        />
-      </div>
+    <!-- Odds padrão -->
+    <div class="mb-3">
+      <label for="oddCasa" class="form-label">Odd Casa</label>
+      <input type="number" step="0.01" id="oddCasa" name="oddCasa" class="form-control"
+        value="<%= jogo.oddCasa ?? '' %>" required />
+    </div>
 
-      <!-- Odds personalizadas -->
-      <h5>Adicionar Odds Personalizadas</h5>
-      <div id="oddsPersonalizadasContainer">
-        <% if (jogo.oddsPersonalizadas && jogo.oddsPersonalizadas.length > 0) {
-        %> <% jogo.oddsPersonalizadas.forEach((odd, index) => { %>
-        <div class="row mb-2">
-          <div class="col">
-            <input
-              type="text"
-              name="oddsPersonalizadas[<%= index %>][descricao]"
-              class="form-control"
-              value="<%= odd.descricao ?? '' %>"
-              placeholder="Descrição"
-              required
-            />
+    <div class="mb-3">
+      <label for="oddEmpate" class="form-label">Odd Empate</label>
+      <input type="number" step="0.01" id="oddEmpate" name="oddEmpate" class="form-control"
+        value="<%= jogo.oddEmpate ?? '' %>" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="oddFora" class="form-label">Odd Fora</label>
+      <input type="number" step="0.01" id="oddFora" name="oddFora" class="form-control"
+        value="<%= jogo.oddFora ?? '' %>" required />
+    </div>
+
+    <!-- Odds personalizadas -->
+    <h5>Adicionar Odds Personalizadas</h5>
+    <div id="oddsPersonalizadasContainer">
+      <% if (jogo.oddsPersonalizadas && jogo.oddsPersonalizadas.length> 0) {
+        %> <% jogo.oddsPersonalizadas.forEach((odd, index)=> { %>
+          <div class="row mb-2">
+            <div class="col">
+              <input type="text" name="oddsPersonalizadas[<%= index %>][descricao]" class="form-control"
+                value="<%= odd.descricao ?? '' %>" placeholder="Descrição" required />
+            </div>
+            <div class="col">
+              <input type="number" step="0.01" name="oddsPersonalizadas[<%= index %>][valor]" class="form-control"
+                value="<%= odd.valor ?? '' %>" placeholder="Valor" required />
+            </div>
           </div>
-          <div class="col">
-            <input
-              type="number"
-              step="0.01"
-              name="oddsPersonalizadas[<%= index %>][valor]"
-              class="form-control"
-              value="<%= odd.valor ?? '' %>"
-              placeholder="Valor"
-              required
-            />
-          </div>
-        </div>
-        <% }); %> <% } %>
-      </div>
+          <% }); %>
+            <% } %>
+    </div>
 
-      <!-- Botão para adicionar mais odds -->
-      <button
-        type="button"
-        class="btn btn-outline-primary mb-3"
-        onclick="adicionarOddPersonalizada()"
-      >
-        Adicionar Odd
-      </button>
-      <br />
+    <!-- Botão para adicionar mais odds -->
+    <button type="button" class="btn btn-outline-primary mb-3" onclick="adicionarOddPersonalizada()">
+      Adicionar Odd
+    </button>
+    <br />
 
-      <!-- Botões de ação -->
-      <button type="submit" class="btn btn-success">Salvar Alterações</button>
-      <a href="/jogos" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
+    <!-- Botões de ação -->
+    <button type="submit" class="btn btn-success">Salvar Alterações</button>
+    <a href="/jogos" class="btn btn-secondary ms-2">Cancelar</a>
+  </form>
 
-    <!-- Script JavaScript -->
-    <script>
-      function adicionarOddPersonalizada() {
-        const container = document.getElementById(
-          "oddsPersonalizadasContainer"
-        );
-        const index = container.children.length;
-        const html = `
+  <!-- Script JavaScript -->
+  <script>
+    function adicionarOddPersonalizada() {
+      const container = document.getElementById(
+        "oddsPersonalizadasContainer"
+      );
+      const index = container.children.length;
+      const html = `
           <div class="row mb-2">
             <div class="col">
               <input type="text" name="oddsPersonalizadas[\${index}][descricao]" class="form-control" placeholder="Descrição" required />
@@ -160,8 +104,9 @@
             </div>
           </div>
         `;
-        container.insertAdjacentHTML("beforeend", html);
-      }
-    </script>
-  </body>
+      container.insertAdjacentHTML("beforeend", html);
+    }
+  </script>
+</body>
+
 </html>
