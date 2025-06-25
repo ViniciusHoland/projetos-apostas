@@ -58,11 +58,14 @@ router.get('/editar/:id', async (req, res) => {
     if (!jogo) return res.status(404).send('Jogo não encontrado');
 
 
-     // ⚠️ Corrige a data antes de enviar para a view
-    const dataUTC = new Date(jogo.dataHora);
-    const offset = dataUTC.getTimezoneOffset(); // minutos
-    const dataHoraLocal = new Date(dataUTC.getTime() - offset * 60 * 1000);
-    jogo.dataHoraLocalFormatada = dataHoraLocal.toISOString().slice(0, 16); // formato yyyy-MM-ddTHH:mm
+    const dataLocal = new Date(jogo.dataHora);
+    const ano = dataLocal.getFullYear();
+    const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataLocal.getDate()).padStart(2, '0');
+    const horas = String(dataLocal.getHours()).padStart(2, '0');
+    const minutos = String(dataLocal.getMinutes()).padStart(2, '0');
+
+    jogo.dataHoraLocalFormatada = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
 
 
     res.render('editarJogo', { jogo });
