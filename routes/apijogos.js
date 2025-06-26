@@ -35,8 +35,8 @@ router.get('/leagues', async (req, res) => {
 13 - libertadores 
 15 → FIFA Club World Cup (World)
 39 - premier league - ingles 
-72 → Serie A (Brazil)
-71 → Serie B (Brazil)
+71 → Serie A (Brazil)
+72 → Serie B (Brazil)
 73 - copa do brasil
 129  - primeira nacional - argentina 
 135: 'Serie A (Itália)',
@@ -54,8 +54,8 @@ const FATOR_REDUCAO_PLACAR = 0.70; // reduz odds em 30%
 
 const ligasTraduzidas = {
   15: 'FIFA Copa do Mundo de Clubes',
-  71: 'Brasil - Brasileirão Série B',
-  72: 'Brasil - Brasileirão Série A',
+  71: 'Brasil - Brasileirão Série A',
+  72: 'Brasil - Brasileirão Série B',
   265: 'Primera División - Chile ',
   140: 'La Liga (Espanhol)',
   2: 'Liga dos Campeões da UEFA',
