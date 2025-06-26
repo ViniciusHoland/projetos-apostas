@@ -167,6 +167,8 @@ router.get('/jogos-hoje', async (req, res) => {
             campeonato: nomeCampeonato,
             timeCasa: jogo.teams.home.name,
             timeFora: jogo.teams.away.name,
+            logoCasa: jogo.teams.home.logo, // ✅ Adicionado
+            logoFora: jogo.teams.away.logo, // ✅ Adicionado
             dataHora: new Date(jogo.fixture.date),
             oddCasa: parseFloat(odds.home),
             oddEmpate: parseFloat(odds.draw),

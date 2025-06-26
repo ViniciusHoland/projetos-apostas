@@ -1,393 +1,349 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Jogos do Dia</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-    <style>
-      #bilhete {
-        max-height: 400px;
-        overflow-y: auto;
-      }
-      .odd-btn {
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body class="bg-light">
-    <div class="container mt-5">
-      <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
 
-      <a href="/apostas" class="btn btn-success btn-lg px-4">
-        <i class="fas fa-futbol"></i> Apostas
-      </a>
-      <a href="/apostas/caixa" class="btn btn-warning text-dark">
-        <i class="fas fa-box"></i> Caixa
-      </a>
+<head>
+  <meta charset="UTF-8" />
+  <title>Jogos do Dia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    #bilhete {
+      max-height: 400px;
+      overflow-y: auto;
+    }
 
-      <h1 class="mb-4">Jogos do Dia</h1>
-      <button class="btn btn-info mb-3" onclick="buscarJogosDoDia()">
-        <i class="fas fa-sync-alt"></i> Atualizar Jogos do Dia
-      </button>
-      <a href="/api/jogos-hoje/delete" class="btn btn-danger text-dark"><i class="fas fa-trash"></i></a>
+    .odd-btn {
+      cursor: pointer;
+    }
+  </style>
+</head>
 
-      <div class="row">
-        <div class="col-md-8">
-          <% if (Object.keys(campeonatos).length === 0) { %>
+<body class="bg-light">
+  <div class="container mt-5">
+    <a href="/" class="btn btn-primary btn-lg px-4">Cadastrar</a>
+
+    <a href="/apostas" class="btn btn-success btn-lg px-4">
+      <i class="fas fa-futbol"></i> Apostas
+    </a>
+    <a href="/apostas/caixa" class="btn btn-warning text-dark">
+      <i class="fas fa-box"></i> Caixa
+    </a>
+
+    <h1 class="mb-4">Jogos do Dia</h1>
+    <button class="btn btn-info mb-3" onclick="buscarJogosDoDia()">
+      <i class="fas fa-sync-alt"></i> Atualizar Jogos do Dia
+    </button>
+    <a href="/api/jogos-hoje/delete" class="btn btn-danger text-dark"><i class="fas fa-trash"></i></a>
+
+    <div class="row">
+      <div class="col-md-8">
+        <% if (Object.keys(campeonatos).length===0) { %>
           <div class="alert alert-info">Nenhum jogo cadastrado para hoje.</div>
-          <% } else { %> <% for (let campeonato in campeonatos) { %>
-          <h4 class="mt-4"><%= campeonato %></h4>
-          <div class="table-responsive">
-            <table class="table table-bordered bg-white">
-              <thead>
-                <tr>
-                  <th>Horário</th>
-                  <th>Times</th>
-                  <th>Casa</th>
-                  <th>Empate</th>
-                  <th>Fora</th>
-                  <th>Personalizadas</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% campeonatos[campeonato].forEach(jogo => { const nomeJogo =
-                jogo.timeCasa + " x " + jogo.timeFora; const campeonatoLimpo =
-                campeonato.replace(/"/g, '&quot;').replace(/'/g, '&#39;'); const
-                dataHoraFormatada = jogo.dataHora; const dataHoraISO =
-                jogo.dataHora; // você pode renomear se quiser %>
-                <tr>
-                  <td>
-                    <%= new Date(jogo.dataHora).toLocaleString('pt-BR', {
-                    timeZone: 'America/Sao_Paulo', day: '2-digit', month:
-                    '2-digit', year: 'numeric', hour: '2-digit', minute:
-                    '2-digit' }) %>
-                  </td>
-                  <td><%= nomeJogo %></td>
-                  <td>
-                    <button
-                      class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Casa", <%= jogo.oddCasa %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
-                    >
-                      <%= jogo.oddCasa.toFixed(2) %>
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Empate", <%= jogo.oddEmpate %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
-                    >
-                      <%= jogo.oddEmpate.toFixed(2) %>
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-outline-primary btn-sm odd-btn"
-                      onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Fora", <%= jogo.oddFora %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
-                    >
-                      <%= jogo.oddFora.toFixed(2) %>
-                    </button>
-                  </td>
-                  <td>
-                    <% if (jogo.oddsPersonalizadas.length === 0) { %> - <% }
-                    else { %>
-                    <div class="d-flex flex-wrap gap-1">
-                      <% jogo.oddsPersonalizadas.forEach(o => { const desc =
-                      o.descricao || ''; const descLimpa = desc.replace(/"/g,
-                      '&quot;').replace(/'/g, '&#39;'); %>
-                      <button
-                        class="btn btn-outline-secondary btn-sm"
-                        style="min-width: 120px"
-                        onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'
-                      >
-                        <small
-                          ><strong><%= o.descricao %></strong>: <%=
-                          Number(o.valor).toFixed(2) %></small
-                        >
-                      </button>
-                      <% }) %>
-                    </div>
-                    <% } %>
-                  </td>
-                  <td class="text-center">
-                    <a
-                      href="/jogos/editar/<%= jogo._id %>"
-                      class="btn btn-warning btn-sm me-1"
-                      >Editar</a
-                    >
-                    <button
-                      class="btn btn-danger btn-sm"
-                      onclick="excluirJogo('<%= jogo._id %>')"
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
-          <% } %> <% } %>
+          <% } else { %>
+            <% for (let campeonato in campeonatos) { %>
+              <h4 class="mt-4">
+                <%= campeonato %>
+              </h4>
+           <% campeonatos[campeonato].forEach(jogo => { const nomeJogo = jogo.timeCasa + " x " + jogo.timeFora; const campeonatoLimpo = campeonato.replace(/"/g, '&quot;').replace(/'/g, '&#39;'); const dataHoraISO = jogo.dataHora; %>
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <strong><%= campeonato %></strong> -
+      <%= new Date(jogo.dataHora).toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }) %>
+    </div>
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-center">
+          <% if (jogo.logoCasa) { %>
+            <img src="<%= jogo.logoCasa %>" width="40" height="40" class="mb-1" />
+          <% } %>
+          <div><strong><%= jogo.timeCasa %></strong></div>
         </div>
-
-        <div class="col-md-4">
-          <h4>Bilhete</h4>
-          <div id="bilhete" class="bg-white border p-3 rounded mb-3">
-            <p class="text-muted">Nenhuma odd selecionada.</p>
-          </div>
-
-          <label for="valorTotal" class="form-label"
-            >Valor Total da Aposta (R$):</label
-          >
-          <input
-            type="number"
-            id="valorTotal"
-            min="0"
-            step="0.01"
-            class="form-control mb-2"
-            value=""
-            oninput="atualizarRetorno()"
-          />
-
-          <p>
-            <strong
-              >Retorno Estimado: R$
-              <span id="retornoEstimado">0.00</span></strong
-            >
-          </p>
-
-          <label for="nomeCliente" class="form-label">Nome do Cliente:</label>
-          <input type="text" id="nomeCliente" class="form-control mb-2" />
-
-          <button
-            id="btnFinalizar"
-            class="btn btn-success mt-3"
-            disabled
-            onclick="finalizarAposta()"
-          >
-            Finalizar Aposta
-          </button>
+        <div class="fs-4 fw-bold">x</div>
+        <div class="text-center">
+          <% if (jogo.logoFora) { %>
+            <img src="<%= jogo.logoFora %>" width="40" height="40" class="mb-1" />
+          <% } %>
+          <div><strong><%= jogo.timeFora %></strong></div>
         </div>
       </div>
+
+      <div class="d-flex justify-content-around mb-2">
+        <button class="btn btn-outline-primary btn-sm odd-btn" onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Casa", <%= jogo.oddCasa %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'>
+          <%= jogo.oddCasa.toFixed(2) %>
+        </button>
+        <button class="btn btn-outline-primary btn-sm odd-btn" onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Empate", <%= jogo.oddEmpate %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'>
+          <%= jogo.oddEmpate.toFixed(2) %>
+        </button>
+        <button class="btn btn-outline-primary btn-sm odd-btn" onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "Fora", <%= jogo.oddFora %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'>
+          <%= jogo.oddFora.toFixed(2) %>
+        </button>
+      </div>
+
+      <% if (jogo.oddsPersonalizadas.length > 0) { %>
+      <div class="d-flex flex-wrap gap-1 mt-2">
+        <% jogo.oddsPersonalizadas.forEach(o => { const desc = o.descricao || ''; const descLimpa = desc.replace(/"/g, '&quot;').replace(/'/g, '&#39;'); %>
+          <button class="btn btn-outline-secondary btn-sm" style="min-width: 120px"
+            onclick='adicionarBilhete("<%= jogo._id %>", "<%= nomeJogo %>", "<%= descLimpa %>", <%= o.valor %>, "<%= campeonatoLimpo %>", "<%= dataHoraISO %>")'>
+            <small><strong><%= o.descricao %></strong>: <%= Number(o.valor).toFixed(2) %></small>
+          </button>
+        <% }) %>
+      </div>
+      <% } %>
+
+      <div class="mt-3 text-end">
+        <a href="/jogos/editar/<%= jogo._id %>" class="btn btn-warning btn-sm me-2">Editar</a>
+        <button class="btn btn-danger btn-sm" onclick="excluirJogo('<%= jogo._id %>')">Excluir</button>
+      </div>
     </div>
+  </div>
+<% }) %>
 
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        const bilheteSalvo = localStorage.getItem("bilhete");
-        if (bilheteSalvo) {
-          try {
-            const bilheteRestaurado = JSON.parse(bilheteSalvo);
-            bilhete.push(...bilheteRestaurado);
-            renderBilhete();
-            atualizarRetorno();
-          } catch (e) {
-            console.error("Erro ao carregar bilhete do localStorage", e);
-          }
-        }
-      });
+              <% } %>
+                <% } %>
+      </div>
 
-      function buscarJogosDoDia() {
-        if (confirm("Deseja atualizar os jogos de hoje?")) {
-          fetch("api/jogos-hoje")
-            .then((response) => {
-              if (response.ok) {
-                location.reload(); // Recarrega a página para mostrar os jogos
-              } else {
-                alert("Erro ao buscar jogos.");
-              }
-            })
-            .catch((err) => {
-              alert("Erro na comunicação com o servidor.");
-              console.error(err);
-            });
+      <div class="col-md-4">
+        <h4>Bilhete</h4>
+        <div id="bilhete" class="bg-white border p-3 rounded mb-3">
+          <p class="text-muted">Nenhuma odd selecionada.</p>
+        </div>
+
+        <label for="valorTotal" class="form-label">Valor Total da Aposta (R$):</label>
+        <input type="number" id="valorTotal" min="0" step="0.01" class="form-control mb-2" value=""
+          oninput="atualizarRetorno()" />
+
+        <p>
+          <strong>Retorno Estimado: R$
+            <span id="retornoEstimado">0.00</span></strong>
+        </p>
+
+        <label for="nomeCliente" class="form-label">Nome do Cliente:</label>
+        <input type="text" id="nomeCliente" class="form-control mb-2" />
+
+        <button id="btnFinalizar" class="btn btn-success mt-3" disabled onclick="finalizarAposta()">
+          Finalizar Aposta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const bilheteSalvo = localStorage.getItem("bilhete");
+      if (bilheteSalvo) {
+        try {
+          const bilheteRestaurado = JSON.parse(bilheteSalvo);
+          bilhete.push(...bilheteRestaurado);
+          renderBilhete();
+          atualizarRetorno();
+        } catch (e) {
+          console.error("Erro ao carregar bilhete do localStorage", e);
         }
       }
+    });
 
-      function salvarBilheteLocal() {
-        localStorage.setItem("bilhete", JSON.stringify(bilhete));
+    function buscarJogosDoDia() {
+      if (confirm("Deseja atualizar os jogos de hoje?")) {
+        fetch("api/jogos-hoje")
+          .then((response) => {
+            if (response.ok) {
+              location.reload(); // Recarrega a página para mostrar os jogos
+            } else {
+              alert("Erro ao buscar jogos.");
+            }
+          })
+          .catch((err) => {
+            alert("Erro na comunicação com o servidor.");
+            console.error(err);
+          });
+      }
+    }
+
+    function salvarBilheteLocal() {
+      localStorage.setItem("bilhete", JSON.stringify(bilhete));
+    }
+
+    const bilhete = [];
+    const bilheteDiv = document.getElementById("bilhete");
+    const btnFinalizar = document.getElementById("btnFinalizar");
+    const valorTotalInput = document.getElementById("valorTotal");
+    const retornoEstimadoSpan = document.getElementById("retornoEstimado");
+
+    function adicionarBilhete(
+      jogoId,
+      jogoNome,
+      tipoOdd,
+      valorOdd,
+      campeonato,
+      dataHora
+    ) {
+      // Verifica se já tem odd para esse jogo (apenas 1 odd por jogo)
+      const existeJogo = bilhete.find((item) => item.jogoId === jogoId);
+      if (existeJogo) {
+        alert("Você já selecionou uma odd para este jogo.");
+        return;
       }
 
-      const bilhete = [];
-      const bilheteDiv = document.getElementById("bilhete");
-      const btnFinalizar = document.getElementById("btnFinalizar");
-      const valorTotalInput = document.getElementById("valorTotal");
-      const retornoEstimadoSpan = document.getElementById("retornoEstimado");
-
-      function adicionarBilhete(
+      bilhete.push({
         jogoId,
         jogoNome,
         tipoOdd,
         valorOdd,
         campeonato,
-        dataHora
-      ) {
-        // Verifica se já tem odd para esse jogo (apenas 1 odd por jogo)
-        const existeJogo = bilhete.find((item) => item.jogoId === jogoId);
-        if (existeJogo) {
-          alert("Você já selecionou uma odd para este jogo.");
-          return;
-        }
+        dataHora,
+        escolha: tipoOdd,
+      });
+      renderBilhete();
+      atualizarRetorno();
+      salvarBilheteLocal();
+    }
 
-        bilhete.push({
-          jogoId,
-          jogoNome,
-          tipoOdd,
-          valorOdd,
-          campeonato,
-          dataHora,
-          escolha: tipoOdd,
-        });
-        renderBilhete();
-        atualizarRetorno();
-        salvarBilheteLocal();
+    function removerDoBilhete(index) {
+      bilhete.splice(index, 1);
+      renderBilhete();
+      atualizarRetorno();
+      salvarBilheteLocal();
+    }
+
+    function renderBilhete() {
+      if (bilhete.length === 0) {
+        bilheteDiv.innerHTML =
+          '<p class="text-muted">Nenhuma odd selecionada.</p>';
+        btnFinalizar.disabled = true;
+        valorTotalInput.value = 0;
+        retornoEstimadoSpan.textContent = "0.00";
+        return;
       }
 
-      function removerDoBilhete(index) {
-        bilhete.splice(index, 1);
-        renderBilhete();
-        atualizarRetorno();
-        salvarBilheteLocal();
-      }
+      btnFinalizar.disabled = false;
 
-      function renderBilhete() {
-        if (bilhete.length === 0) {
-          bilheteDiv.innerHTML =
-            '<p class="text-muted">Nenhuma odd selecionada.</p>';
-          btnFinalizar.disabled = true;
-          valorTotalInput.value = 0;
-          retornoEstimadoSpan.textContent = "0.00";
-          return;
-        }
-
-        btnFinalizar.disabled = false;
-
-        bilheteDiv.innerHTML = "";
-        bilhete.forEach((item, idx) => {
-          const div = document.createElement("div");
-          div.classList.add("mb-3", "border-bottom", "pb-2");
-          div.innerHTML = `
+      bilheteDiv.innerHTML = "";
+      bilhete.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.classList.add("mb-3", "border-bottom", "pb-2");
+        div.innerHTML = `
           <strong>${item.jogoNome}</strong><br/>
           <small>Tipo: ${item.tipoOdd}</small><br/>
           <small>Odd: ${item.valorOdd}</small>
           <button class="btn btn-sm btn-danger float-end" onclick="removerDoBilhete(${idx})">X</button>
         `;
-          bilheteDiv.appendChild(div);
-        });
+        bilheteDiv.appendChild(div);
+      });
+    }
+
+    function atualizarRetorno() {
+      const valorTotal = parseFloat(valorTotalInput.value);
+      if (isNaN(valorTotal) || valorTotal <= 0) {
+        retornoEstimadoSpan.textContent = "0.00";
+        btnFinalizar.disabled = true;
+        return;
+      }
+      btnFinalizar.disabled = bilhete.length === 0;
+
+      // Multiplicar as odds
+      const produtoOdds = bilhete.reduce(
+        (acc, item) => acc * item.valorOdd,
+        1
+      );
+
+      let retorno = produtoOdds * valorTotal;
+      if (retorno > 2000) {
+        retorno = 2000;
+      }
+      retornoEstimadoSpan.textContent = retorno.toFixed(2);
+    }
+
+    function finalizarAposta() {
+      const valorTotal = parseFloat(valorTotalInput.value);
+      const nomeCliente = document.getElementById("nomeCliente").value.trim();
+
+      if (!nomeCliente) {
+        alert("Informe o nome do cliente.");
+        return;
       }
 
-      function atualizarRetorno() {
-        const valorTotal = parseFloat(valorTotalInput.value);
-        if (isNaN(valorTotal) || valorTotal <= 0) {
-          retornoEstimadoSpan.textContent = "0.00";
-          btnFinalizar.disabled = true;
-          return;
-        }
-        btnFinalizar.disabled = bilhete.length === 0;
-
-        // Multiplicar as odds
-        const produtoOdds = bilhete.reduce(
-          (acc, item) => acc * item.valorOdd,
-          1
-        );
-
-        let retorno = produtoOdds * valorTotal;
-        if (retorno > 2000) {
-          retorno = 2000;
-        }
-        retornoEstimadoSpan.textContent = retorno.toFixed(2);
+      if (isNaN(valorTotal) || valorTotal <= 0) {
+        alert("Informe um valor válido para apostar.");
+        return;
+      }
+      if (bilhete.length === 0) {
+        alert("Selecione pelo menos uma odd para apostar.");
+        return;
       }
 
-      function finalizarAposta() {
-        const valorTotal = parseFloat(valorTotalInput.value);
-        const nomeCliente = document.getElementById("nomeCliente").value.trim();
+      const cotacaoTotal = bilhete.reduce(
+        (acc, item) => acc * item.valorOdd,
+        1
+      );
+      let possivelRetorno = cotacaoTotal * valorTotal;
 
-        if (!nomeCliente) {
-          alert("Informe o nome do cliente.");
-          return;
-        }
+      if (possivelRetorno > 2000) {
+        possivelRetorno = 2000;
+      }
 
-        if (isNaN(valorTotal) || valorTotal <= 0) {
-          alert("Informe um valor válido para apostar.");
-          return;
-        }
-        if (bilhete.length === 0) {
-          alert("Selecione pelo menos uma odd para apostar.");
-          return;
-        }
+      const aposta = {
+        nomeCliente,
+        jogos: bilhete.map((jogo) => ({
+          ...jogo,
+          data: jogo.dataHora, // ou a data real do jogo, se tiver
+          status: "", // pode deixar vazio ou "Pendente"
+        })),
+        cotacaoTotal,
+        valorApostado: valorTotal,
+        possivelRetorno,
+        data: new Date().toISOString(),
+      };
 
-        const cotacaoTotal = bilhete.reduce(
-          (acc, item) => acc * item.valorOdd,
-          1
-        );
-        let possivelRetorno = cotacaoTotal * valorTotal;
+      // Exemplo de envio para backend usando fetch (descomente e ajuste a rota)
 
-        if (possivelRetorno > 2000) {
-          possivelRetorno = 2000;
-        }
+      fetch("/apostas/apostar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(aposta),
+      })
+        .then(async (res) => {
+          if (res.ok) {
+            const data = await res.json();
+            alert("Aposta realizada com sucesso!");
+            const link = `${window.location.origin}/apostas/bilhete/${data.id}`;
+            console.log("Link do bilhete:", link);
 
-        const aposta = {
-          nomeCliente,
-          jogos: bilhete.map((jogo) => ({
-            ...jogo,
-            data: jogo.dataHora, // ou a data real do jogo, se tiver
-            status: "", // pode deixar vazio ou "Pendente"
-          })),
-          cotacaoTotal,
-          valorApostado: valorTotal,
-          possivelRetorno,
-          data: new Date().toISOString(),
-        };
-
-        // Exemplo de envio para backend usando fetch (descomente e ajuste a rota)
-
-        fetch("/apostas/apostar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(aposta),
-        })
-          .then(async (res) => {
-            if (res.ok) {
-              const data = await res.json();
-              alert("Aposta realizada com sucesso!");
-              const link = `${window.location.origin}/apostas/bilhete/${data.id}`;
-              console.log("Link do bilhete:", link);
-
-              // Pode mostrar na tela ou copiar pro clipboard
-              const bilheteLinkDiv = document.createElement("div");
-              bilheteLinkDiv.classList.add("alert", "alert-success", "mt-3");
-              bilheteLinkDiv.innerHTML = `
+            // Pode mostrar na tela ou copiar pro clipboard
+            const bilheteLinkDiv = document.createElement("div");
+            bilheteLinkDiv.classList.add("alert", "alert-success", "mt-3");
+            bilheteLinkDiv.innerHTML = `
       Bilhete gerado com sucesso! <br>
       <a href="${link}" target="_blank">${link}</a>
     `;
-              document.querySelector(".container").appendChild(bilheteLinkDiv);
+            document.querySelector(".container").appendChild(bilheteLinkDiv);
 
-              // Limpa bilhete e inputs
-              bilhete.length = 0;
-              renderBilhete();
-              valorTotalInput.value = 0;
-              atualizarRetorno();
-            } else {
-              alert("Erro ao salvar a aposta.");
-            }
-          })
-          .catch(() => alert("Erro na comunicação com o servidor."));
+            // Limpa bilhete e inputs
+            bilhete.length = 0;
+            renderBilhete();
+            valorTotalInput.value = 0;
+            atualizarRetorno();
+          } else {
+            alert("Erro ao salvar a aposta.");
+          }
+        })
+        .catch(() => alert("Erro na comunicação com o servidor."));
 
-        bilhete.length = 0;
-        renderBilhete();
-        valorTotalInput.value = 0;
-        atualizarRetorno();
-        localStorage.removeItem("bilhete");
-      }
+      bilhete.length = 0;
+      renderBilhete();
+      valorTotalInput.value = 0;
+      atualizarRetorno();
+      localStorage.removeItem("bilhete");
+    }
 
-      function gerarBilheteVisual(aposta) {
-        const bilheteHtml = `
+    function gerarBilheteVisual(aposta) {
+      const bilheteHtml = `
     <div class="border p-3 bg-light mt-3 shadow" id="bilhete-finalizado" style="max-width: 400px; margin: auto;">
       <p><strong>DATA:</strong> ${new Date(aposta.data).toLocaleString(
         "pt-BR",
@@ -402,8 +358,8 @@
       </div>
       <hr/>
       ${aposta.jogos
-        .map(
-          (jogo) => `
+          .map(
+            (jogo) => `
         <div>
           <strong>Futebol - ${jogo.dataHora || "Data/Hora"}</strong><br/>
           ${jogo.campeonato || "Campeonato"}<br/>
@@ -418,42 +374,43 @@
           <hr/>
         </div>
       `
-        )
-        .join("")}
+          )
+          .join("")}
       <p><strong>Quantidade de Jogos:</strong> ${aposta.jogos.length}</p>
       <p><strong>Cotação:</strong> ${aposta.cotacaoFinal?.toFixed(2)}</p>
       <p><strong>Total Apostado:</strong> R$ ${aposta.valorApostado.toFixed(
-        2
-      )}</p>
+            2
+          )}</p>
       <p><strong>Possível Retorno:</strong> R$ ${aposta.possivelRetorno.toFixed(
-        2
-      )}</p>
+            2
+          )}</p>
 
     </div>
   `;
 
-        const bilheteExistente = document.getElementById("bilhete-finalizado");
-        if (bilheteExistente) bilheteExistente.remove();
+      const bilheteExistente = document.getElementById("bilhete-finalizado");
+      if (bilheteExistente) bilheteExistente.remove();
 
-        const container = document.querySelector(".container");
-        container.insertAdjacentHTML("beforeend", bilheteHtml);
-      }
-      function excluirJogo(id) {
-        if (confirm("Tem certeza que deseja excluir este jogo?")) {
-          fetch("/jogos/" + id, {
-            method: "DELETE",
+      const container = document.querySelector(".container");
+      container.insertAdjacentHTML("beforeend", bilheteHtml);
+    }
+    function excluirJogo(id) {
+      if (confirm("Tem certeza que deseja excluir este jogo?")) {
+        fetch("/jogos/" + id, {
+          method: "DELETE",
+        })
+          .then((res) => {
+            if (res.ok) {
+              alert("Jogo excluído com sucesso!");
+              location.reload();
+            } else {
+              alert("Erro ao excluir o jogo.");
+            }
           })
-            .then((res) => {
-              if (res.ok) {
-                alert("Jogo excluído com sucesso!");
-                location.reload();
-              } else {
-                alert("Erro ao excluir o jogo.");
-              }
-            })
-            .catch(() => alert("Erro de comunicação com o servidor."));
-        }
+          .catch(() => alert("Erro de comunicação com o servidor."));
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
+
 </html>

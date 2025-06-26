@@ -9,6 +9,8 @@ const jogoSchema = new mongoose.Schema({
   oddCasa: Number,
   oddEmpate: Number,
   oddFora: Number,
+  logoCasa: String,
+  logoFora: String,
   oddsPersonalizadas: [
     {
       descricao: String,
