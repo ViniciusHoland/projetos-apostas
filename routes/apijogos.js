@@ -211,8 +211,9 @@ router.get('/jogos-hoje', async (req, res) => {
 router.get('/jogos-hoje/delete', async (req, res) => {
 
   try {
+
     await Jogo.deleteMany({});
-    res.redirect('/jogos-hoje');
+    res.redirect('/jogos');
   } catch (error) {
     console.error('Erro ao deletar jogos:', error.response?.data || error.message);
     res.status(500).send('Erro ao deletar jogos');
