@@ -63,6 +63,7 @@ const ligasTraduzidas = {
   13: 'Libertadores',
   39: 'Premier League (Inglaterra)',
   73: 'Copa do Brasil',
+  129: 'Primeira Nacional - Argentina',
   135: 'Serie A (Itália)',
   239: 'Primeira A - Colombia '
 };
