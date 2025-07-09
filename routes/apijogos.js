@@ -47,7 +47,7 @@ router.get('/leagues', async (req, res) => {
 */
 
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
-const leagueFiltro = new Set([ 2, 11 , 13, 15, 39 , 71, 72, 73, 129, 135, 140, 265, 239]);
+const leagueFiltro = new Set([ 2, 11 , 13, 15, 39 , 71, 72, 73, 129, 135, 140, 265, 239,612]);
 const CASA_DE_APOSTA = '1xBet'; // nome da casa
 const FATOR_REDUCAO = 0.80; // reduz odds em 20%
 const FATOR_REDUCAO_PLACAR = 0.70; // reduz odds em 30%
@@ -65,7 +65,8 @@ const ligasTraduzidas = {
   73: 'Copa do Brasil',
   129: 'Primeira Nacional - Argentina',
   135: 'Serie A (Itália)',
-  239: 'Primeira A - Colombia '
+  239: 'Primeira A - Colombia ',
+  612: 'Brasil - Copa do Nordeste',
 };
 
 function limitarOdd(valor, maximo = 12) {
