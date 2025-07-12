@@ -7,7 +7,7 @@ router.post('/apostar', async (req, res) => {
     const { nomeCliente, jogos, valorApostado, possivelRetorno } = req.body;
 
     if (!nomeCliente || nomeCliente.trim() === '') {
-      return res.status(400).send('Nome do cliente é obrigatório');
+      return res.status(400).send('Nome do cliente é obrigatório ');
     }
 
     if (!Array.isArray(jogos) || jogos.length === 0 || !valorApostado || valorApostado <= 0) {
