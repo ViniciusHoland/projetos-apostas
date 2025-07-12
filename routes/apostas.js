@@ -2,66 +2,52 @@ const express = require('express');
 const router = express.Router();
 const Aposta = require('../models/Aposta');
 
-
-
 router.post('/apostar', async (req, res) => {
   try {
     const { nomeCliente, jogos, valorApostado, possivelRetorno } = req.body;
-
-    const retornoEstimado = possivelRetorno;
-
-    //console.log('Dados recebidos:', req.body);
 
     if (!nomeCliente || nomeCliente.trim() === '') {
       return res.status(400).send('Nome do cliente é obrigatório');
     }
 
-    if (!jogos || jogos.length === 0 || !valorApostado || valorApostado <= 0) {
+    if (!Array.isArray(jogos) || jogos.length === 0 || !valorApostado || valorApostado <= 0) {
       return res.status(400).send('Dados inválidos');
     }
 
-    const parseDate = (str) => {
-      // Esperado: "17/06/2025, 19:30"
-      if (!str || typeof str !== 'string') return null;
+    // 💡 Usar o valor direto como retorno estimado, mas garantir que seja numérico
+    const retornoEstimado = Number(possivelRetorno) || 0;
 
-      const [data, hora] = str.split(', ');
-      const [dia, mes, ano] = data.split('/');
-
-      // Monta string em formato ISO: YYYY-MM-DDTHH:MM:SS
-      const dateISO = `${ano}-${mes}-${dia}T${hora}:00`;
-
-      const dateObj = new Date(dateISO);
-      return isNaN(dateObj.getTime()) ? null : dateObj;
-    };
-
-
-    // ✅ Trata os jogos e garante o campo dataHora e status
+    // Monta os jogos para salvar
     const jogosCompletos = jogos.map(jogo => ({
       campeonato: jogo.campeonato || '---',
       jogoId: jogo.jogoId,
       jogoNome: jogo.jogoNome || '---',
       tipoOdd: jogo.tipoOdd || '---',
-      valorOdd: jogo.valorOdd || 0,
-      status: jogo.status && jogo.status !== '' ? jogo.status : 'Aberta',
-      dataHora: jogo.dataHora || 'Data não disponível' // Mantém como string
+      valorOdd: Number(jogo.valorOdd) || 0,
+      status: jogo.status?.trim() || 'Aberta',
+      dataHora: jogo.dataHora || 'Data não disponível',
+      logoCasa: jogo.logoCasa || '',
+      logoFora: jogo.logoFora || ''
     }));
 
-    const aposta = new Aposta({
-      nomeCliente,
+    const novaAposta = new Aposta({
+      nomeCliente: nomeCliente.trim(),
       jogos: jogosCompletos,
-      valorApostado,
+      valorApostado: Number(valorApostado),
       retornoEstimado,
       data: new Date()
     });
 
-    await aposta.save();
-    res.status(201).json({ message: 'Aposta salva com sucesso', id: aposta._id });
+    await novaAposta.save();
+
+    res.status(201).json({ message: 'Aposta salva com sucesso', id: novaAposta._id });
 
   } catch (err) {
-    console.error(err);
+    console.error('[Erro ao salvar aposta]:', err);
     res.status(500).send('Erro ao salvar aposta');
   }
 });
+
 
 router.get('/bilhete/:id/print', async (req, res) => {
   try {

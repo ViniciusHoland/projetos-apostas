@@ -7,6 +7,8 @@ const jogoApostadoSchema = new mongoose.Schema({
   tipoOdd: String,
   valorOdd: Number,
   dataHora: String,
+  logoCasa: String,
+  logoFora: String,
   status: {
     type: String,
     default: 'Aberta'

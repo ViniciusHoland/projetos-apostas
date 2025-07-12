@@ -12,7 +12,7 @@
         font-size: 17px;
       }
       .bilhete {
-        background-color: #fff9c4; /* amarelo claro */
+        background-color: #fff9c4;
         padding: 20px;
         border-radius: 10px;
         max-width: 400px;
@@ -31,19 +31,31 @@
         border-bottom: 1px dashed #bbb;
         padding: 5px 0;
       }
+      .times-com-logo {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      .times-com-logo img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
       @media print {
         body {
           background: white;
         }
         .bilhete {
-          max-width: 58mm; /* largura típica para mini impressora */
+          max-width: 58mm;
           margin: 0 auto;
           box-shadow: none;
           border: none;
-          font-size: 10px; /* fonte menor para caber bem */
+          font-size: 10px;
         }
         .no-print {
-          display: none; /* esconde o botão ao imprimir */
+          display: none;
         }
       }
     </style>
@@ -64,10 +76,15 @@
         <div class="linha">
           <strong>DATA:</strong>
           <span>
-            <%= new Date(bilhete.data).toLocaleString('pt-BR', { timeZone:
-            'America/Sao_Paulo', day: '2-digit', month: '2-digit', year:
-            'numeric', hour: '2-digit', minute: '2-digit' }) %></span
-          >
+            <%= new Date(bilhete.data).toLocaleString('pt-BR', {
+              timeZone: 'America/Sao_Paulo',
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }) %>
+          </span>
         </div>
         <div class="linha">
           <strong>CLIENTE:</strong>
@@ -83,23 +100,40 @@
         <% bilhete.jogos.forEach(jogo => { %>
         <div class="aposta-item">
           <div><%= jogo.campeonato %></div>
-          <div><strong><%= jogo.jogoNome %></strong></div>
-          <div><%= jogo.timeCasa %> x <%= jogo.timeFora %></div>
+
+          <div class="times-com-logo">
+            <% if (jogo.logoCasa) { %>
+              <img src="<%= jogo.logoCasa %>" alt="Logo Casa">
+            <% } %>
+            <strong><%= jogo.jogoNome?.split(" x ")[0] || "Time Casa" %></strong>
+
+            <span>x</span>
+
+            <strong><%= jogo.jogoNome?.split(" x ")[1] || "Time Fora" %></strong>
+            <% if (jogo.logoFora) { %>
+              <img src="<%= jogo.logoFora %>" alt="Logo Fora">
+            <% } %>
+          </div>
+
           <div>
             <small>
-              <strong>Data/Hora: </strong><%= new
-              Date(jogo.dataHora).toLocaleString('pt-BR', { timeZone:
-              'America/Sao_Paulo', day: '2-digit', month: '2-digit', year:
-              'numeric', hour: '2-digit', minute: '2-digit' }) %>
+              <strong>Data/Hora:</strong>
+              <%= new Date(jogo.dataHora).toLocaleString('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }) %>
             </small>
           </div>
           <div>Odd: <strong><%= jogo.tipoOdd %></strong></div>
-
           <div class="text-end">
             <small><%= jogo.valorOdd.toFixed(2) %></small>
           </div>
           <div class="text-end">
-            <strong class="text-end"><%= jogo.status || "Aberta" %></strong>
+            <strong><%= jogo.status || "Aberta" %></strong>
           </div>
         </div>
         <% }) %>
@@ -107,18 +141,9 @@
         <hr />
 
         <p><strong>Quantidade de Jogos:</strong> <%= bilhete.jogos.length %></p>
-        <p>
-          <strong>Cotação:</strong> <%= bilhete.cotacaoTotal ?
-          bilhete.cotacaoTotal.toFixed(2) : "---" %>
-        </p>
-        <p>
-          <strong>Total Apostado:</strong> R$ <%=
-          bilhete.valorApostado.toFixed(2) %>
-        </p>
-        <p>
-          <strong>Possível Retorno:</strong> R$ <%=
-          bilhete.retornoEstimado.toFixed(2) %>
-        </p>
+        <p><strong>Cotação:</strong> <%= bilhete.cotacaoTotal ? bilhete.cotacaoTotal.toFixed(2) : "---" %></p>
+        <p><strong>Total Apostado:</strong> R$ <%= bilhete.valorApostado.toFixed(2) %></p>
+        <p><strong>Possível Retorno:</strong> R$ <%= bilhete.retornoEstimado.toFixed(2) %></p>
       </div>
     </div>
   </body>
