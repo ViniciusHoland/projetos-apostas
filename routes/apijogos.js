@@ -49,7 +49,7 @@ router.get('/leagues', async (req, res) => {
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
 const leagueFiltro = new Set([ 11 , 13, 15, 39 , 71, 72, 73, 2 , 135, 140,612]);
 const CASA_DE_APOSTA = '1xBet'; // nome da casa
-const FATOR_REDUCAO = 0.90; // reduz odds em 10%
+const FATOR_REDUCAO = 0.85; // reduz odds em 15%
 const FATOR_REDUCAO_CASA = 0.85; // reduz odds em 15%
 const FATOR_REDUCAO_PLACAR = 0.80; // reduz odds em 20%
 
