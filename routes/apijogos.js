@@ -47,26 +47,27 @@ router.get('/leagues', async (req, res) => {
 */
 
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
-const leagueFiltro = new Set([ 2, 11 , 13, 15, 39 , 71, 72, 73, 135, 140, 265, 239,612]);
+const leagueFiltro = new Set([ 11 , 13, 15, 39 , 71, 72, 73, 2 , 135, 140,612]);
 const CASA_DE_APOSTA = '1xBet'; // nome da casa
-const FATOR_REDUCAO = 0.85; // reduz odds em 15%
-const FATOR_REDUCAO_CASA = 0.80; // reduz odds em 15%
-const FATOR_REDUCAO_PLACAR = 0.70; // reduz odds em 30%
+const FATOR_REDUCAO = 0.90; // reduz odds em 10%
+const FATOR_REDUCAO_CASA = 0.85; // reduz odds em 15%
+const FATOR_REDUCAO_PLACAR = 0.80; // reduz odds em 20%
+
+//129: 'Primeira Nacional  - Argentina',
+//239: 'Primeira A - Colombia ',
+//265: 'Primera División - Chile ',
 
 const ligasTraduzidas = {
   15: 'FIFA Copa do Mundo de Clubes',
   71: 'Brasil - Brasileirão Série A',
   72: 'Brasil - Brasileirão Série B',
-  265: 'Primera División - Chile ',
   140: 'La Liga (Espanhol)',
   2: 'Liga dos Campeões da UEFA',
   11: 'Copa Sul-Americana',
   13: 'Libertadores',
   39: 'Premier League (Inglaterra)',
   73: 'Copa do Brasil',
-  //129: 'Primeira Nacional  - Argentina',
   135: 'Serie A (Itália)',
-  239: 'Primeira A - Colombia ',
   612: 'Brasil - Copa do Nordeste',
 };
 
