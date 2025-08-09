@@ -47,8 +47,8 @@ router.get('/leagues', async (req, res) => {
 */
 
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
-const leagueFiltro = new Set([ 11 , 13, 15, 39 , 71, 72, 73, 2 , 135, 140, 128 ,612]);
-const CASA_DE_APOSTA = '1xBet'; // nome da casa
+const leagueFiltro = new Set([15, 71, 72, 73, 11, 13, 39, 135, 140, 612]);
+const CASA_DE_APOSTA = 'Pinnacle'; // nome da casa
 const FATOR_REDUCAO = 0.90; // reduz odds em 15%
 const FATOR_REDUCAO_CASA = 0.90; // reduz odds em 15%
 const FATOR_REDUCAO_PLACAR = 0.80; // reduz odds em 20%
@@ -56,6 +56,7 @@ const FATOR_REDUCAO_PLACAR = 0.80; // reduz odds em 20%
 //129: 'Primeira Nacional  - Argentina',
 //239: 'Primeira A - Colombia ',
 //265: 'Primera División - Chile ',
+
 
 const ligasTraduzidas = {
   15: 'FIFA Copa do Mundo de Clubes',
@@ -88,6 +89,14 @@ router.get('/jogos-hoje', async (req, res) => {
 
     const fixtures = resHoje.data.response.filter(jogo => leagueFiltro.has(jogo.league.id));
 
+    console.log('✅ Jogos após filtro de ligas:', fixtures.map(j => ({
+      id: j.fixture.id,
+      campeonato: j.league.name,
+      timeCasa: j.teams.home.name,
+      timeFora: j.teams.away.name,
+      horario: j.fixture.date
+    })));
+
     const jogosComOdds = await Promise.all(
       fixtures.map(async (jogo) => {
         try {
@@ -96,19 +105,40 @@ router.get('/jogos-hoje', async (req, res) => {
             params: { fixture: jogo.fixture.id }
           });
 
+          //console.log(`🔍 Odds brutas do jogo ${jogo.fixture.id}:`, JSON.stringify(oddsResponse.data, null, 2));
+
           const oddsData = oddsResponse.data.response?.[0];
-          const bm = oddsData?.bookmakers?.find(b => b.name === CASA_DE_APOSTA);
 
-          if (!bm) return null;
+          const bm = oddsData?.bookmakers?.find(bm =>
+            bm.bets?.some(bet => bet.name === 'Match Winner')
+          );
 
+
+          if (!bm) {
+            console.log(`❌ Nenhuma casa com mercado "Match Winner" para o jogo ${jogo.fixture.id}`);
+            return;
+          }
+
+          // Se encontrou a casa, agora busca o mercado
           const mercadoPrincipal = bm.bets.find(bet => bet.name === 'Match Winner');
 
-          const odds = mercadoPrincipal?.values.reduce((acc, v) => {
-            if (v.value === 'Home') acc.home = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO_CASA);
-            if (v.value === 'Draw') acc.draw = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
-            if (v.value === 'Away') acc.away = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
-            return acc;
-          }, {}) || {};
+
+          let odds = {};
+
+          if (mercadoPrincipal?.values?.length) {
+            odds = mercadoPrincipal.values.reduce((acc, v) => {
+              if (v.value === 'Home') acc.home = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO_CASA);
+              if (v.value === 'Draw') acc.draw = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
+              if (v.value === 'Away') acc.away = limitarOdd(parseFloat(v.odd) * FATOR_REDUCAO);
+              return acc;
+            }, {});
+
+
+
+          } else {
+            console.log(`❌ Mercado "Match Winner" não encontrado para o jogo ${jogo.fixture.id}`);
+            return null; // pula esse jogo
+          }
 
           const oddsPersonalizadas = [];
 
@@ -154,7 +184,7 @@ router.get('/jogos-hoje', async (req, res) => {
 
           const resultadoExato = bm.bets.find(bet => bet.name === 'Exact Score');
           if (resultadoExato?.values?.length) {
-            const placaresDesejados = ['2:1', '3:1', '1:1', '1:2', '1:3','2:0','0:2' , '1:0', '0:1'];
+            const placaresDesejados = ['2:1', '3:1', '1:1', '1:2', '1:3', '2:0', '0:2', '1:0', '0:1'];
             resultadoExato.values.forEach(v => {
               if (placaresDesejados.includes(v.value)) {
                 oddsPersonalizadas.push({
@@ -166,6 +196,8 @@ router.get('/jogos-hoje', async (req, res) => {
           }
 
           const nomeCampeonato = ligasTraduzidas[jogo.league.id] || jogo.league.name;
+
+
 
           return {
             fixtureId: jogo.fixture.id,
@@ -183,6 +215,8 @@ router.get('/jogos-hoje', async (req, res) => {
         } catch (err) {
           return null;
         }
+
+
       })
     );
 
@@ -191,7 +225,12 @@ router.get('/jogos-hoje', async (req, res) => {
     for (const jogo of jogosFiltrados) {
       const existe = await Jogo.findOne({ fixtureId: jogo.fixtureId });
       if (!existe) {
-        await Jogo.create(jogo);
+        try {
+          console.log('🆕 Salvando jogo no banco:', jogo);
+          await Jogo.create(jogo);
+        } catch (erro) {
+          console.error('❌ Erro ao salvar jogo:', erro.message, jogo);
+        }
       }
     }
 
@@ -211,6 +250,8 @@ router.get('/jogos-hoje', async (req, res) => {
     res.status(500).send('Erro ao obter jogos');
   }
 });
+
+//const leagueFiltroBrasil = new Set([ 71, 72, 11,13,73]);
 
 
 router.get('/jogos-hoje/delete', async (req, res) => {

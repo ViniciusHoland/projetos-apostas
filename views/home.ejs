@@ -38,6 +38,8 @@
       <button class="btn btn-info mb-3" onclick="buscarJogosDoDia()">
         <i class="fas fa-sync-alt"></i> Atualizar Jogos do Dia
       </button>
+     
+
       <a href="/api/jogos-hoje/delete" class="btn btn-danger text-dark"
         ><i class="fas fa-trash"></i
       ></a>
@@ -256,6 +258,9 @@
             });
         }
       }
+
+
+       
 
       function salvarBilheteLocal() {
         localStorage.setItem("bilhete", JSON.stringify(bilhete));
