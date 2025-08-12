@@ -48,11 +48,11 @@ router.get('/leagues', async (req, res) => {
 
 const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
 const leagueFiltro = new Set([15, 71, 72, 73, 11, 13, 39, 135, 140, 612]);
-const CASA_DE_APOSTA = 'Pinnacle'; // nome da casa
-const FATOR_REDUCAO = 0.90; // reduz odds em 15%
-const FATOR_REDUCAO_CASA = 0.90; // reduz odds em 15%
+const CASA_DE_APOSTA = '1xBet'; // nome da casa
+const FATOR_REDUCAO = 0.90; // reduz odds em 10%
+const FATOR_REDUCAO_CASA = 0.90; // reduz odds em 10%
 const FATOR_REDUCAO_FORA = 0.85; // reduz odds em 15%
-const FATOR_REDUCAO_PLACAR = 0.80; // reduz odds em 20%
+const FATOR_REDUCAO_PLACAR = 0.85; // reduz odds em 15%
 
 //129: 'Primeira Nacional  - Argentina',
 //239: 'Primeira A - Colombia ',
