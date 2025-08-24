@@ -83,6 +83,10 @@ router.get('/jogos-hoje', async (req, res) => {
     const hoje = new Date();
     const dataHoje = hoje.toISOString().split('T')[0];
 
+    //const hoje = new Date();
+    //oje.setDate(hoje.getDate() + 1);
+    //const dataHoje = hoje.toISOString().split('T')[0];
+
     const resHoje = await axios.get('https://v3.football.api-sports.io/fixtures', {
       headers: { 'x-apisports-key': API_TOKEN },
       params: { date: dataHoje, timezone: 'America/Sao_Paulo' }
