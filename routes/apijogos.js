@@ -50,9 +50,9 @@ const Jogo = require('../models/Jogo'); // ajuste o caminho se necessário
 const leagueFiltro = new Set([15,2, 71, 72, 73, 11, 13, 39, 135, 140, 612]);
 const CASA_DE_APOSTA = '1xBet'; // nome da casa
 const FATOR_REDUCAO = 0.90; // reduz odds em 10%
-const FATOR_REDUCAO_CASA = 0.90; // reduz odds em 10%
-const FATOR_REDUCAO_FORA = 0.85; // reduz odds em 15%
-const FATOR_REDUCAO_PLACAR = 0.85; // reduz odds em 15%
+const FATOR_REDUCAO_CASA = 0.92; // reduz odds em 10%
+const FATOR_REDUCAO_FORA = 0.90; // reduz odds em 15%
+const FATOR_REDUCAO_PLACAR = 0.92; // reduz odds em 15%
 
 //129: 'Primeira Nacional  - Argentina',
 //239: 'Primeira A - Colombia ',
@@ -74,7 +74,7 @@ const ligasTraduzidas = {
   612: 'Brasil - Copa do Nordeste',
 };
 
-function limitarOdd(valor, maximo = 12) {
+function limitarOdd(valor, maximo = 15) {
   return Math.min(parseFloat(valor), maximo).toFixed(2);
 }
 
@@ -84,7 +84,7 @@ router.get('/jogos-hoje', async (req, res) => {
     const dataHoje = hoje.toISOString().split('T')[0];
 
     //const hoje = new Date();
-    //oje.setDate(hoje.getDate() + 1);
+    //hoje.setDate(hoje.getDate() + 1);
     //const dataHoje = hoje.toISOString().split('T')[0];
 
     const resHoje = await axios.get('https://v3.football.api-sports.io/fixtures', {
